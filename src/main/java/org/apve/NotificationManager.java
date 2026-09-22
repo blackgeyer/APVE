@@ -1,7 +1,6 @@
 package org.apve;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -20,7 +19,8 @@ public class NotificationManager {
     }
 
     public void loadMessages() {
-        this.template = plugin.getConfig().getString("command-msg.violation-notify-msg");
+        String configTemplate = plugin.getConfig().getString("command-msg.violation-notify-msg");
+        this.template = configTemplate;
     }
 
     public boolean toggleNotifications(UUID uuid) {
@@ -38,15 +38,15 @@ public class NotificationManager {
     }
 
     public void sendViolationAlert(Player violator, NetworkChatInterceptor.ViolationType type, String badWord, String rawMessage) {
-        String formattedAlert = ChatColor.translateAlternateColorCodes('&', template
+        String formattedAlert = template
                 .replace("{player}", violator.getName())
                 .replace("{type}", type.name())
                 .replace("{word}", badWord.isEmpty() ? "—" : badWord)
-                .replace("{message}", rawMessage));
+                .replace("{message}", rawMessage);
 
         for (Player staff : Bukkit.getOnlinePlayers()) {
             if (staff.hasPermission("apve.violation.notify") && isEnabled(staff.getUniqueId())) {
-                staff.sendMessage(formattedAlert);
+                MessageUtil.send(staff, formattedAlert);
             }
         }
     }

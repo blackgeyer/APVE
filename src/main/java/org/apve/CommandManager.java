@@ -1,25 +1,19 @@
 package org.apve;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.command.ConsoleCommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
 
 public class CommandManager implements CommandExecutor, TabCompleter {
 
@@ -58,6 +52,14 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     private String checkColorSuspicious;
     private String checkColorNone;
 
+    private String cmdCheckHeaderMSG;
+    private String cmdCheckRawMSG;
+    private String cmdCheckNormalizedMSG;
+    private String cmdCheckStatusMSG;
+    private String cmdCheckWordMSG;
+    private String cmdCheckDictMSG;
+    private String cmdCheckDetailMSG;
+
     public CommandManager(apve plugin) {
         this.plugin = plugin;
         loadMessages();
@@ -89,7 +91,14 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         this.checkColorMalicious = config.getString("command-msg.check.status-colors.malicious");
         this.checkColorSuspicious = config.getString("command-msg.check.status-colors.suspicious");
         this.checkColorNone = config.getString("command-msg.check.status-colors.none");
-    
+
+        this.cmdCheckHeaderMSG = config.getString("command-msg.check-in-cmd.header");
+        this.cmdCheckRawMSG = config.getString("command-msg.check-in-cmd.raw");
+        this.cmdCheckNormalizedMSG = config.getString("command-msg.check-in-cmd.normalized");
+        this.cmdCheckStatusMSG = config.getString("command-msg.check-in-cmd.status");
+        this.cmdCheckWordMSG = config.getString("command-msg.check-in-cmd.matched-word");
+        this.cmdCheckDictMSG = config.getString("command-msg.check-in-cmd.dict-word");
+        this.cmdCheckDetailMSG = config.getString("command-msg.check-in-cmd.detail");
     }
 
     @Override
@@ -142,56 +151,55 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     private void handleCheck(CommandSender sender, String[] args) {
-    if (!sender.hasPermission(PERMISSION_CHECK)) {
-        send(sender, permFailMSG);
-        return;
-    }
+        if (!sender.hasPermission(PERMISSION_CHECK)) {
+            send(sender, permFailMSG);
+            return;
+        }
 
-    if (args.length < 2) {
-        send(sender, invalidSyntaxMSG, "{usage}", "/apve check {String}");
-        return;
-    }
+        if (args.length < 2) {
+            send(sender, invalidSyntaxMSG, "{usage}", "/apve check {String}");
+            return;
+        }
 
-    String rawText = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-    NetworkChatInterceptor.InspectionResult result = NetworkChatInterceptor.inspect(rawText);
-    String status = result.violationType();
+        String rawText = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        NetworkChatInterceptor.InspectionResult result = NetworkChatInterceptor.inspect(rawText);
+        String status = result.violationType();
 
-    if (sender instanceof ConsoleCommandSender) {
-        String normDisplay = result.normalizedText().isEmpty() ? "[empty]" : result.normalizedText();
+        if (sender instanceof ConsoleCommandSender) {
+            String normDisplay = result.normalizedText().isEmpty() ? "[empty]" : result.normalizedText();
 
-        plugin.getLogger().info("=== A.P.V.E. Inspection ===");
-        plugin.getLogger().info("Input text: " + result.rawText());
-        plugin.getLogger().info("Normalized text: " + normDisplay);
-        plugin.getLogger().info("Check status: " + status);
+            send(sender, cmdCheckHeaderMSG);
+            send(sender, cmdCheckRawMSG, "{raw}", result.rawText());
+            send(sender, cmdCheckNormalizedMSG, "{normalized}", normDisplay);
+            send(sender, cmdCheckStatusMSG, "{status}", status);
+
+            if (!"NONE".equals(status)) {
+                send(sender, cmdCheckWordMSG, "{word}", result.matchedInputWord());
+                send(sender, cmdCheckDictMSG, "{dict}", result.matchedDictWord());
+                send(sender, cmdCheckDetailMSG, "{detail}", result.detail());
+            }
+            return;
+        }
+
+        String statusColor = switch (status) {
+            case "MALICIOUS" -> checkColorMalicious;
+            case "SUSPICIOUS" -> checkColorSuspicious;
+            default -> checkColorNone;
+        };
+
+        String normDisplay = result.normalizedText().isEmpty() ? "&c[empty]" : "&a" + result.normalizedText();
+
+        send(sender, checkHeaderMSG);
+        send(sender, checkRawMSG, "{raw}", result.rawText());
+        send(sender, checkNormalizedMSG, "{normalized}", normDisplay);
+        send(sender, checkStatusMSG, "{status_color}", statusColor, "{status}", status);
 
         if (!"NONE".equals(status)) {
-            plugin.getLogger().info("Matched word: " + result.matchedInputWord());
-            plugin.getLogger().info("Dictionary sample: " + result.matchedDictWord());
-            plugin.getLogger().info("Details: " + result.detail());
+            send(sender, checkWordMSG, "{word}", result.matchedInputWord());
+            send(sender, checkDictMSG, "{dict}", result.matchedDictWord());
+            send(sender, checkDetailMSG, "{detail}", result.detail());
         }
-        return;
     }
-
-    String statusColor = switch (status) {
-        case "MALICIOUS" -> checkColorMalicious;
-        case "SUSPICIOUS" -> checkColorSuspicious;
-        default -> checkColorNone;
-    };
-
-    String normDisplay = result.normalizedText().isEmpty() ? "&c[empty]" : "&a" + result.normalizedText();
-
-    send(sender, checkHeaderMSG);
-    send(sender, checkRawMSG, "{raw}", result.rawText());
-    send(sender, checkNormalizedMSG, "{normalized}", normDisplay);
-    send(sender, checkStatusMSG, "{status_color}", statusColor, "{status}", status);
-
-    if (!"NONE".equals(status)) {
-        send(sender, checkWordMSG, "{word}", result.matchedInputWord());
-        send(sender, checkDictMSG, "{dict}", result.matchedDictWord());
-        send(sender, checkDetailMSG, "{detail}", result.detail());
-    }
-}
-   
 
     private void handleWarns(CommandSender sender, String[] args) {
         if (args.length < 3) {
@@ -273,7 +281,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         }
 
         for (String line : helpMSG) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', line));
+            MessageUtil.send(sender, line);
         }
     }
 
@@ -317,16 +325,18 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     }
 
     private void send(CommandSender sender, String template, String... replacements) {
-        if (template == null || template.isEmpty()) return;
+        String formatted = formatMessage(template, replacements);
+        MessageUtil.send(sender, formatted);
+    }
 
+    private String formatMessage(String template, String... replacements) {
         String formatted = template;
         for (int i = 0; i < replacements.length; i += 2) {
             if (i + 1 < replacements.length) {
                 formatted = formatted.replace(replacements[i], replacements[i + 1]);
             }
         }
-        
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', formatted));
+        return formatted;
     }
 
     private List<String> filterPrefix(List<String> list, String prefix) {

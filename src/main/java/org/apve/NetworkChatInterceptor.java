@@ -5,7 +5,6 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatCommand;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 
 import org.bukkit.Bukkit;
@@ -19,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
@@ -141,15 +141,14 @@ public class NetworkChatInterceptor {
     private static final Map<UUID, StoredViolation> highestViolations = new ConcurrentHashMap<>();
     private static final Map<UUID, BukkitTask> resetTasks = new ConcurrentHashMap<>();
     private static final Map<UUID, Deque<SpamEntry>> spamHistory = new ConcurrentHashMap<>();
-    private static final Set<UUID> externallyMutedPlayers = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private static final Set<UUID> pendingBlockMessages = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private static final Map<UUID, String> pendingCensorMessages = new ConcurrentHashMap<>();
-    private static final Set<UUID> apveCancelledMessages = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private static final Set<String> PERSONAL_PRONOUNS = Set.of("ty", "vy", "on", "ona", "oni", "tebe", "tebya", "toboy", "vas", "vam", "emu", "ey", "tvoya", "tvoyu", "tvoy", "tvoego", "tvoemu", "tvoim", "vashu", "vashe", "vash", "ego", "eyo", "ih", "you", "your", "he", "she", "they", "his", "her", "their", "u");
     private static final Pattern IP_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)[\\._,\\s\\-]){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
     private static final Pattern NON_LETTER_PATTERN = Pattern.compile("[^a-zA-Z\u0400-\u04FF]");
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
+    private static final Set<String> TARGET_PLAYER_COMMANDS = Set.of("msg", "tell", "w", "whisper", "pm", "message", "m");
 
     public static boolean hasImmunity(Player player, ViolationType type) {
         return switch (type) {
@@ -166,25 +165,43 @@ public class NetworkChatInterceptor {
 
     public static void loadConfig(FileConfiguration config, FoolProof.ValidationResult validation) {
         Map<String, Integer> priorityMap = validation.priorityMap();
-        ViolationType.STAFF_INSULT.setPriority(priorityMap.getOrDefault("staff-insult", 6));
-        ViolationType.FAMILY_INSULT.setPriority(priorityMap.getOrDefault("family-insult", 5));
-        ViolationType.ADVERTISEMENT.setPriority(priorityMap.getOrDefault("ad-dist", 8));
-        ViolationType.SOCIAL_MEDIA.setPriority(priorityMap.getOrDefault("soc-media-dist", 7));
-        ViolationType.ADULT_CONTENT.setPriority(priorityMap.getOrDefault("adult-content", 4));
-        ViolationType.INSULT.setPriority(priorityMap.getOrDefault("insult", 3));
-        ViolationType.SPAM.setPriority(priorityMap.getOrDefault("spam", 2));
-        ViolationType.CAPS.setPriority(priorityMap.getOrDefault("caps", 1));
+        int staffPriority = priorityMap.getOrDefault("staff-insult", 6);
+        int familyPriority = priorityMap.getOrDefault("family-insult", 5);
+        int adPriority = priorityMap.getOrDefault("ad-dist", 8);
+        int socPriority = priorityMap.getOrDefault("soc-media-dist", 7);
+        int adultPriority = priorityMap.getOrDefault("adult-content", 4);
+        int insultPriority = priorityMap.getOrDefault("insult", 3);
+        int spamPriority = priorityMap.getOrDefault("spam", 2);
+        int capsPriority = priorityMap.getOrDefault("caps", 1);
+
+        ViolationType.STAFF_INSULT.setPriority(staffPriority);
+        ViolationType.FAMILY_INSULT.setPriority(familyPriority);
+        ViolationType.ADVERTISEMENT.setPriority(adPriority);
+        ViolationType.SOCIAL_MEDIA.setPriority(socPriority);
+        ViolationType.ADULT_CONTENT.setPriority(adultPriority);
+        ViolationType.INSULT.setPriority(insultPriority);
+        ViolationType.SPAM.setPriority(spamPriority);
+        ViolationType.CAPS.setPriority(capsPriority);
 
         Map<ViolationType, ViolationRule> rulesMap = new EnumMap<>(ViolationType.class);
 
-        rulesMap.put(ViolationType.INSULT, new ViolationRule(config.getBoolean("insult.is-enabled"), config.getBoolean("insult.punishment-is-enabled"), config.getString("insult.type").toLowerCase(), config.getString("insult.duration"), config.getString("insult.reason"), config.getBoolean("insult.blocking"), config.getString("insult.blocking-reason"), config.getBoolean("insult.censor"), config.getString("insult.censor-reason")));
-        rulesMap.put(ViolationType.FAMILY_INSULT, new ViolationRule(config.getBoolean("family-insult.is-enabled"), config.getBoolean("family-insult.punishment-is-enabled"), config.getString("family-insult.type").toLowerCase(), config.getString("family-insult.duration"), config.getString("family-insult.reason"), config.getBoolean("family-insult.blocking"), config.getString("family-insult.blocking-reason"), config.getBoolean("family-insult.censor"), config.getString("family-insult.censor-reason")));
-        rulesMap.put(ViolationType.STAFF_INSULT, new ViolationRule(config.getBoolean("staff-insult.is-enabled"), config.getBoolean("staff-insult.punishment-is-enabled"), config.getString("staff-insult.type").toLowerCase(), config.getString("staff-insult.duration"), config.getString("staff-insult.reason"), config.getBoolean("staff-insult.blocking"), config.getString("staff-insult.blocking-reason"), config.getBoolean("staff-insult.censor"), config.getString("staff-insult.censor-reason")));
-        rulesMap.put(ViolationType.ADVERTISEMENT, new ViolationRule(config.getBoolean("ad-dist.is-enabled"), config.getBoolean("ad-dist.punishment-is-enabled"), config.getString("ad-dist.type").toLowerCase(), config.getString("ad-dist.duration"), config.getString("ad-dist.reason"), config.getBoolean("ad-dist.blocking"), config.getString("ad-dist.blocking-reason"), config.getBoolean("ad-dist.censor"), config.getString("ad-dist.censor-reason")));
-        rulesMap.put(ViolationType.SOCIAL_MEDIA, new ViolationRule(config.getBoolean("soc-media-dist.is-enabled"), config.getBoolean("soc-media-dist.punishment-is-enabled"), config.getString("soc-media-dist.type").toLowerCase(), config.getString("soc-media-dist.duration"), config.getString("soc-media-dist.reason"), config.getBoolean("soc-media-dist.blocking"), config.getString("soc-media-dist.blocking-reason"), config.getBoolean("soc-media-dist.censor"), config.getString("soc-media-dist.censor-reason")));
-        rulesMap.put(ViolationType.ADULT_CONTENT, new ViolationRule(config.getBoolean("adult-content.is-enabled"), config.getBoolean("adult-content.punishment-is-enabled"), config.getString("adult-content.type").toLowerCase(), config.getString("adult-content.duration"), config.getString("adult-content.reason"), config.getBoolean("adult-content.blocking"), config.getString("adult-content.blocking-reason"), config.getBoolean("adult-content.censor"), config.getString("adult-content.censor-reason")));
-        rulesMap.put(ViolationType.SPAM, new ViolationRule(config.getBoolean("spam.is-enabled"), config.getBoolean("spam.punishment-is-enabled"), config.getString("spam.type").toLowerCase(), config.getString("spam.duration"), config.getString("spam.reason"), config.getBoolean("spam.blocking"), config.getString("spam.blocking-reason"), config.getBoolean("spam.censor"), config.getString("spam.censor-reason")));
-        rulesMap.put(ViolationType.CAPS, new ViolationRule(config.getBoolean("caps.is-enabled"), config.getBoolean("caps.punishment-is-enabled"), config.getString("caps.type").toLowerCase(), config.getString("caps.duration"), config.getString("caps.reason"), config.getBoolean("caps.blocking"), config.getString("caps.blocking-reason"), config.getBoolean("caps.censor"), config.getString("caps.censor-reason")));
+        ViolationRule insultRule = new ViolationRule(config.getBoolean("insult.is-enabled"), config.getBoolean("insult.punishment-is-enabled"), config.getString("insult.type").toLowerCase(), config.getString("insult.duration"), config.getString("insult.reason"), config.getBoolean("insult.blocking"), config.getString("insult.blocking-reason"), config.getBoolean("insult.censor"), config.getString("insult.censor-reason"));
+        ViolationRule familyInsultRule = new ViolationRule(config.getBoolean("family-insult.is-enabled"), config.getBoolean("family-insult.punishment-is-enabled"), config.getString("family-insult.type").toLowerCase(), config.getString("family-insult.duration"), config.getString("family-insult.reason"), config.getBoolean("family-insult.blocking"), config.getString("family-insult.blocking-reason"), config.getBoolean("family-insult.censor"), config.getString("family-insult.censor-reason"));
+        ViolationRule staffInsultRule = new ViolationRule(config.getBoolean("staff-insult.is-enabled"), config.getBoolean("staff-insult.punishment-is-enabled"), config.getString("staff-insult.type").toLowerCase(), config.getString("staff-insult.duration"), config.getString("staff-insult.reason"), config.getBoolean("staff-insult.blocking"), config.getString("staff-insult.blocking-reason"), config.getBoolean("staff-insult.censor"), config.getString("staff-insult.censor-reason"));
+        ViolationRule adRule = new ViolationRule(config.getBoolean("ad-dist.is-enabled"), config.getBoolean("ad-dist.punishment-is-enabled"), config.getString("ad-dist.type").toLowerCase(), config.getString("ad-dist.duration"), config.getString("ad-dist.reason"), config.getBoolean("ad-dist.blocking"), config.getString("ad-dist.blocking-reason"), config.getBoolean("ad-dist.censor"), config.getString("ad-dist.censor-reason"));
+        ViolationRule socMediaRule = new ViolationRule(config.getBoolean("soc-media-dist.is-enabled"), config.getBoolean("soc-media-dist.punishment-is-enabled"), config.getString("soc-media-dist.type").toLowerCase(), config.getString("soc-media-dist.duration"), config.getString("soc-media-dist.reason"), config.getBoolean("soc-media-dist.blocking"), config.getString("soc-media-dist.blocking-reason"), config.getBoolean("soc-media-dist.censor"), config.getString("soc-media-dist.censor-reason"));
+        ViolationRule adultRule = new ViolationRule(config.getBoolean("adult-content.is-enabled"), config.getBoolean("adult-content.punishment-is-enabled"), config.getString("adult-content.type").toLowerCase(), config.getString("adult-content.duration"), config.getString("adult-content.reason"), config.getBoolean("adult-content.blocking"), config.getString("adult-content.blocking-reason"), config.getBoolean("adult-content.censor"), config.getString("adult-content.censor-reason"));
+        ViolationRule spamRule = new ViolationRule(config.getBoolean("spam.is-enabled"), config.getBoolean("spam.punishment-is-enabled"), config.getString("spam.type").toLowerCase(), config.getString("spam.duration"), config.getString("spam.reason"), config.getBoolean("spam.blocking"), config.getString("spam.blocking-reason"), config.getBoolean("spam.censor"), config.getString("spam.censor-reason"));
+        ViolationRule capsRule = new ViolationRule(config.getBoolean("caps.is-enabled"), config.getBoolean("caps.punishment-is-enabled"), config.getString("caps.type").toLowerCase(), config.getString("caps.duration"), config.getString("caps.reason"), config.getBoolean("caps.blocking"), config.getString("caps.blocking-reason"), config.getBoolean("caps.censor"), config.getString("caps.censor-reason"));
+
+        rulesMap.put(ViolationType.INSULT, insultRule);
+        rulesMap.put(ViolationType.FAMILY_INSULT, familyInsultRule);
+        rulesMap.put(ViolationType.STAFF_INSULT, staffInsultRule);
+        rulesMap.put(ViolationType.ADVERTISEMENT, adRule);
+        rulesMap.put(ViolationType.SOCIAL_MEDIA, socMediaRule);
+        rulesMap.put(ViolationType.ADULT_CONTENT, adultRule);
+        rulesMap.put(ViolationType.SPAM, spamRule);
+        rulesMap.put(ViolationType.CAPS, capsRule);
 
         boolean consoleLog = config.getBoolean("console-log");
         boolean notifiesEnabled = config.getBoolean("notifies");
@@ -213,23 +230,23 @@ public class NetworkChatInterceptor {
 
         AhoCorasick ac = new AhoCorasick();
 
-        List<String> badRoots = config.getStringList("bad-roots");
-        for (String root : badRoots) ac.addPattern(root, ViolationType.INSULT);
+        List<String> badRootsList = config.getStringList("bad-roots");
+        for (String root : badRootsList) ac.addPattern(root, ViolationType.INSULT);
 
-        List<String> insultWords = config.getStringList("insult-words");
-        for (String word : insultWords) ac.addPattern(word, ViolationType.INSULT);
+        List<String> insultWordsList = config.getStringList("insult-words");
+        for (String word : insultWordsList) ac.addPattern(word, ViolationType.INSULT);
 
-        List<String> adultRoots = config.getStringList("adult-roots");
-        for (String root : adultRoots) ac.addPattern(root, ViolationType.ADULT_CONTENT);
+        List<String> adultRootsList = config.getStringList("adult-roots");
+        for (String root : adultRootsList) ac.addPattern(root, ViolationType.ADULT_CONTENT);
 
-        List<String> adultWords = config.getStringList("adult-words");
-        for (String word : adultWords) ac.addPattern(word, ViolationType.ADULT_CONTENT);
+        List<String> adultWordsList = config.getStringList("adult-words");
+        for (String word : adultWordsList) ac.addPattern(word, ViolationType.ADULT_CONTENT);
 
-        List<String> adWords = config.getStringList("ad-words");
-        for (String word : adWords) ac.addPattern(word, ViolationType.ADVERTISEMENT);
+        List<String> adWordsList = config.getStringList("ad-words");
+        for (String word : adWordsList) ac.addPattern(word, ViolationType.ADVERTISEMENT);
 
-        List<String> socialWords = config.getStringList("social");
-        for (String word : socialWords) ac.addPattern(word, ViolationType.SOCIAL_MEDIA);
+        List<String> socialWordsList = config.getStringList("social");
+        for (String word : socialWordsList) ac.addPattern(word, ViolationType.SOCIAL_MEDIA);
 
         ac.build();
 
@@ -248,7 +265,8 @@ public class NetworkChatInterceptor {
         double mediumThreshold = config.getDouble("thresholds.medium");
         boolean auditMode = config.getBoolean("audit-mode");
 
-        String domainRegex = "(?i)\\b[a-z0-9\\-_]+\\.(?:" + String.join("|", validation.blockedDomains()) + ")\\b";
+        List<String> blockedDomainsList = new ArrayList<>(validation.blockedDomains());
+        String domainRegex = "(?i)\\b[a-z0-9\\-_]+\\.(?:" + String.join("|", blockedDomainsList) + ")\\b";
         Pattern domainPattern = Pattern.compile(domainRegex);
 
         boolean spamIsEnabled = config.getBoolean("spam.is-enabled");
@@ -260,11 +278,13 @@ public class NetworkChatInterceptor {
         int capsMinLength = config.getInt("caps.min-message-length");
         int capsMinPct = config.getInt("caps.min-caps-percentage");
 
+        Set<String> interceptedCommandsSet = validation.interceptedCommands();
+
         cachedRules = new ChatRulesCache(
             highThreshold, mediumThreshold, auditMode,
-            new HashSet<>(allowedWordsList), insultWords,
-            familyContextWords, staffTitles, new HashSet<>(expressiveWordsList), adultWords,
-            socialWords, domainPattern, validation.interceptedCommands(), spamIsEnabled,
+            new HashSet<>(allowedWordsList), insultWordsList,
+            familyContextWords, staffTitles, new HashSet<>(expressiveWordsList), adultWordsList,
+            socialWordsList, domainPattern, interceptedCommandsSet, spamIsEnabled,
             spamMaxSimilar, spamWindowMs, spamSimThreshold, capsIsEnabled,
             capsMinLength, capsMinPct, ac
         );
@@ -277,221 +297,17 @@ public class NetworkChatInterceptor {
             new PacketListenerAbstract(PacketListenerPriority.HIGH) {
                 @Override
                 public void onPacketReceive(PacketReceiveEvent event) {
-
-                    boolean isChatMsg = event.getPacketType() == PacketType.Play.Client.CHAT_MESSAGE;
-                    boolean isChatCmd = event.getPacketType() == PacketType.Play.Client.CHAT_COMMAND;
-                    if (!isChatMsg && !isChatCmd) return;
+                    if (event.getPacketType() != PacketType.Play.Client.CHAT_MESSAGE) return;
 
                     Player player = Bukkit.getPlayer(event.getUser().getUUID());
+                    if (player == null) return;
 
-                    final ChatRulesCache rules = cachedRules;
-                    final GlobalConfig cfg = cachedConfig;
+                    if (punishmentManager.isMuted(player.getUniqueId())) return;
 
-                    String rawText = extractRawText(event, isChatMsg, isChatCmd, rules.interceptedCommands());
-                    if (rawText.isEmpty()) return;
+                    String rawText = new WrapperPlayClientChatMessage(event).getMessage();
+                    if (rawText.startsWith("/")) return;
 
-                    String normalized = TextNormalizer.normalize(rawText);
-                    String fullyCompressed = TextNormalizer.removeSpaces(normalized);
-                    int[] spaceMap = TextNormalizer.createSpaceMapping(normalized);
-
-                    ViolationType spamCandidate = null;
-                    if (rules.spamModuleEnabled() && checkAndRecordSpam(player.getUniqueId(), normalized, rules.spamMaxCount(), rules.spamWindowMs(), rules.spamSimThreshold())) {
-                        spamCandidate = ViolationType.SPAM;
-                    }
-
-                    ViolationType capsCandidate = null;
-                    if (rules.capsModuleEnabled() && isCaps(rawText, rules.capsMinLength(), rules.capsMinPct())) {
-                        capsCandidate = ViolationType.CAPS;
-                    }
-
-                    String domainNormalized = TextNormalizer.normalizeForDomain(rawText);
-                    boolean hasLinkBypass = domainNormalized.contains("http") || domainNormalized.contains("www");
-
-                    if (containsIP(rawText) || rules.domainPattern().matcher(domainNormalized).find() || hasLinkBypass) {
-                        ViolationType detected = ViolationType.ADVERTISEMENT;
-                        String reason = "IP/Link/Domain";
-
-                        for (String social : rules.socialWords()) {
-                            if (domainNormalized.contains(social.toLowerCase())) {
-                                detected = ViolationType.SOCIAL_MEDIA;
-                                reason = "Social Media Link: " + social;
-                                break;
-                            }
-                        }
-
-                        if (!hasImmunity(player, detected)) {
-                            dispatch(plugin, player, punishmentManager, notificationManager, event, rawText, rawText, detected, reason, cfg, isChatMsg, rules.auditMode(), suspiciousLogger, maliciousLogger);
-                            return;
-                        }
-                    }
-
-                    List<AhoCorasick.Match> acMatches = rules.ahoCorasick().search(fullyCompressed);
-                    boolean acPunished = false;
-
-                    for (AhoCorasick.Match match : acMatches) {
-                        String pattern = match.pattern();
-                        int c_start = match.startIndex();
-                        int c_end = match.endIndex();
-
-                        int n_start = spaceMap[c_start];
-                        int n_end = spaceMap[c_end - 1] + 1;
-                        String span = normalized.substring(n_start, n_end);
-
-                        boolean isValidViolation = true;
-
-                        if (span.contains(" ")) {
-                            boolean cutsWord = false;
-
-                            if (n_start > 0 && Character.isLetter(normalized.charAt(n_start - 1))) cutsWord = true;
-                            if (n_end < normalized.length() && Character.isLetter(normalized.charAt(n_end))) cutsWord = true;
-
-                            if (cutsWord) {
-                                isValidViolation = false;
-                            } else {
-                                String[] parts = span.split("\\s+");
-                                boolean allAllowed = true;
-                                for (String part : parts) {
-                                    if (part.isEmpty()) continue;
-                                    if (!rules.allowedWords().contains(part)) {
-                                        allAllowed = false;
-                                        break;
-                                    }
-                                }
-                                if (allAllowed) isValidViolation = false;
-                            }
-                        }
-
-                        if (isValidViolation) {
-                            ViolationType finalType = match.type();
-
-                            if (finalType == ViolationType.INSULT) {
-                                String[] normWords = normalized.split("\\s+");
-                                int tokenStartIdx = 0;
-                                int charCount = 0;
-                                for (int j = 0; j < normWords.length; j++) {
-                                    charCount += normWords[j].length();
-                                    if (charCount > n_start) {
-                                        tokenStartIdx = j;
-                                        break;
-                                    }
-                                    charCount++;
-                                }
-
-                                if (hasStaffContext(normWords, rules.staffTitles(), tokenStartIdx)) {
-                                    finalType = ViolationType.STAFF_INSULT;
-                                } else if (hasFamilyContext(normWords, rules.familyWords(), tokenStartIdx)) {
-                                    finalType = ViolationType.FAMILY_INSULT;
-                                }
-                            }
-
-                            if (hasImmunity(player, finalType)) {
-                                continue;
-                            }
-
-                            dispatch(plugin, player, punishmentManager, notificationManager, event, rawText, pattern, finalType, "Found via AC Anti-Bypass: " + pattern, cfg, isChatMsg, rules.auditMode(), suspiciousLogger, maliciousLogger);
-                            acPunished = true;
-                            break;
-                        }
-                    }
-
-                    if (acPunished) return;
-
-                    String[] normWords = normalized.split("\\s+");
-                    String[] rawWords = rawText.toLowerCase().split("\\s+");
-
-                    ViolationType detectedType = null;
-                    String matchedWord = "";
-                    String reasonDetail = "";
-                    String rawMatchWord = "";
-                    double maxSimilarity = 0.0;
-                    String suspectedInsult = "";
-
-                    outer:
-                    for (int i = 0; i < normWords.length; i++) {
-                        final String word = normWords[i];
-                        final String rawWord = (i < rawWords.length) ? rawWords[i] : word;
-
-                        if (word.isEmpty() || rules.allowedWords().contains(word)) continue;
-
-                        ViolationRule adultRule = cfg.rules().get(ViolationType.ADULT_CONTENT);
-                        if (adultRule.enabled() && !hasImmunity(player, ViolationType.ADULT_CONTENT)) {
-                            for (String adult : rules.adultWords()) {
-                                if (SimilarityChecker.getSimilarityRatio(word, adult, 0.0) >= rules.highThreshold()) {
-                                    detectedType = ViolationType.ADULT_CONTENT;
-                                    matchedWord = adult;
-                                    reasonDetail = "Adult content: " + adult;
-                                    rawMatchWord = rawWord;
-                                    break outer;
-                                }
-                            }
-                        }
-
-                        for (String insult : rules.insultWords()) {
-                            double sim = SimilarityChecker.getSimilarityRatio(word, insult, 0.0);
-                            if (sim > maxSimilarity) {
-                                maxSimilarity = sim;
-                                suspectedInsult = insult;
-                                rawMatchWord = rawWord;
-                                if (maxSimilarity >= rules.highThreshold()) break;
-                            }
-                        }
-
-                        if (maxSimilarity >= rules.highThreshold()) {
-                            ViolationType candType = ViolationType.INSULT;
-                            if (hasStaffContext(normWords, rules.staffTitles(), i)) {
-                                candType = ViolationType.STAFF_INSULT;
-                            } else if (hasFamilyContext(normWords, rules.familyWords(), i)) {
-                                candType = ViolationType.FAMILY_INSULT;
-                            }
-
-                            if (!hasImmunity(player, candType)) {
-                                matchedWord = suspectedInsult;
-                                reasonDetail = "Insult (fuzzy): " + matchedWord;
-                                detectedType = candType;
-                                break outer;
-                            }
-                        }
-
-                        if (rules.expressiveWords().contains(word)) {
-                            boolean targetedAtPronoun =
-                                    (i > 0 && PERSONAL_PRONOUNS.contains(normWords[i - 1])) ||
-                                    (i < normWords.length - 1 && PERSONAL_PRONOUNS.contains(normWords[i + 1]));
-                            boolean targetedAtStaff = hasStaffContext(normWords, rules.staffTitles(), i);
-                            boolean targetedAtFamily = hasFamilyContext(normWords, rules.familyWords(), i);
-
-                            if (targetedAtPronoun || targetedAtStaff || targetedAtFamily) {
-                                ViolationType candType = ViolationType.INSULT;
-                                if (targetedAtStaff) {
-                                    candType = ViolationType.STAFF_INSULT;
-                                } else if (targetedAtFamily) {
-                                    candType = ViolationType.FAMILY_INSULT;
-                                }
-
-                                if (!hasImmunity(player, candType)) {
-                                    matchedWord = word;
-                                    rawMatchWord = rawWord;
-                                    reasonDetail = "Targeted profanity: " + word;
-                                    detectedType = candType;
-                                    break outer;
-                                }
-                            }
-                        }
-                    }
-
-                    if (detectedType != null) {
-                        dispatch(plugin, player, punishmentManager, notificationManager, event, rawText, rawMatchWord, detectedType, reasonDetail, cfg, isChatMsg, rules.auditMode(), suspiciousLogger, maliciousLogger);
-                    } else if (spamCandidate != null && !hasImmunity(player, ViolationType.SPAM)) {
-                        dispatch(plugin, player, punishmentManager, notificationManager, event, rawText, rawText, ViolationType.SPAM, "Spam", cfg, isChatMsg, rules.auditMode(), suspiciousLogger, maliciousLogger);
-                    } else if (capsCandidate != null && !hasImmunity(player, ViolationType.CAPS)) {
-                        dispatch(plugin, player, punishmentManager, notificationManager, event, rawText, rawText, ViolationType.CAPS, "Caps", cfg, isChatMsg, rules.auditMode(), suspiciousLogger, maliciousLogger);
-                    } else if (maxSimilarity >= rules.mediumThreshold() && maxSimilarity < rules.highThreshold()) {
-                        if (rules.auditMode() || cfg.consoleLog()) {
-                            String prefix = rules.auditMode() ? "[AUDIT-MODE | SUSPICIOUS]" : "[SUSPICIOUS]";
-                            suspiciousLogger.warning(String.format(
-                                    "%s Player: %s | Text: '%s' | Suspicion: '%s' (%.0f%%)",
-                                    prefix, player.getName(), rawText, suspectedInsult, maxSimilarity * 100));
-                        }
-                    }
+                    processChatMessage(plugin, player, rawText, event, punishmentManager, notificationManager, suspiciousLogger, maliciousLogger);
                 }
             }
         );
@@ -503,7 +319,6 @@ public class NetworkChatInterceptor {
                 if (pendingBlockMessages.remove(uuid)) {
                     if (!event.isCancelled()) {
                         event.setCancelled(true);
-                        apveCancelledMessages.add(uuid);
                     }
                     return;
                 }
@@ -513,36 +328,490 @@ public class NetworkChatInterceptor {
                 }
             }
 
-            @EventHandler(priority = EventPriority.MONITOR)
-            public void onAsyncChatMonitor(AsyncPlayerChatEvent event) {
-                UUID uuid = event.getPlayer().getUniqueId();
-                if (event.isCancelled()) {
-                    if (!apveCancelledMessages.remove(uuid)) {
-                        externallyMutedPlayers.add(uuid);
-                    }
-                } else {
-                    apveCancelledMessages.remove(uuid);
-                    externallyMutedPlayers.remove(uuid);
-                }
+            @EventHandler(priority = EventPriority.HIGHEST)
+            public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+                if (event.isCancelled()) return;
+
+                Player player = event.getPlayer();
+                if (punishmentManager.isMuted(player.getUniqueId())) return;
+
+                final ChatRulesCache rules = cachedRules;
+                Set<String> interceptedCmds = rules.interceptedCommands();
+
+                String fullCommand = event.getMessage();
+                String rawText = extractRawTextFromCommand(fullCommand, interceptedCmds);
+                if (rawText.isEmpty()) return;
+
+                processCommand(plugin, player, rawText, fullCommand, event, punishmentManager, notificationManager, suspiciousLogger, maliciousLogger);
             }
 
             @EventHandler
             public void onQuit(PlayerQuitEvent event) {
                 UUID uuid = event.getPlayer().getUniqueId();
-                externallyMutedPlayers.remove(uuid);
                 pendingBlockMessages.remove(uuid);
                 pendingCensorMessages.remove(uuid);
-                apveCancelledMessages.remove(uuid);
             }
         }, plugin);
     }
 
-    public static void dispatch(Plugin plugin, Player player, PunishmentManager pm, NotificationManager nm,
-                                PacketReceiveEvent event, String rawText, String badWord,
-                                ViolationType type, String reasonDetail, GlobalConfig cfg,
-                                boolean isChatMsg, boolean auditMode,
-                                Logger suspiciousLogger, Logger maliciousLogger) {
+    private static void processChatMessage(JavaPlugin plugin, Player player, String rawText, PacketReceiveEvent event,
+                                           PunishmentManager pm, NotificationManager nm,
+                                           Logger suspiciousLogger, Logger maliciousLogger) {
+        final ChatRulesCache rules = cachedRules;
+        final GlobalConfig cfg = cachedConfig;
 
+        String normalized = TextNormalizer.normalize(rawText);
+        String fullyCompressed = TextNormalizer.removeSpaces(normalized);
+        int[] spaceMap = TextNormalizer.createSpaceMapping(normalized);
+
+        ViolationType spamCandidate = null;
+        boolean spamEnabled = rules.spamModuleEnabled();
+        if (spamEnabled && checkAndRecordSpam(player.getUniqueId(), normalized, rules.spamMaxCount(), rules.spamWindowMs(), rules.spamSimThreshold())) {
+            spamCandidate = ViolationType.SPAM;
+        }
+
+        ViolationType capsCandidate = null;
+        boolean capsEnabled = rules.capsModuleEnabled();
+        if (capsEnabled && isCaps(rawText, rules.capsMinLength(), rules.capsMinPct())) {
+            capsCandidate = ViolationType.CAPS;
+        }
+
+        String domainNormalized = TextNormalizer.normalizeForDomain(rawText);
+        boolean hasLinkBypass = domainNormalized.contains("http") || domainNormalized.contains("www");
+        boolean hasIpMatch = containsIP(rawText);
+        Pattern domainPatternVal = rules.domainPattern();
+        boolean hasDomainMatch = domainPatternVal.matcher(domainNormalized).find();
+
+        if (hasIpMatch || hasDomainMatch || hasLinkBypass) {
+            ViolationType detected = ViolationType.ADVERTISEMENT;
+            String reason = "IP/Link/Domain";
+
+            List<String> socialMediaList = rules.socialWords();
+            for (String social : socialMediaList) {
+                String lowerSocial = social.toLowerCase();
+                if (domainNormalized.contains(lowerSocial)) {
+                    detected = ViolationType.SOCIAL_MEDIA;
+                    reason = "Social Media Link: " + social;
+                    break;
+                }
+            }
+
+            if (!hasImmunity(player, detected)) {
+                dispatchChatMessage(plugin, player, pm, nm, event, rawText, rawText, detected, reason, cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+                return;
+            }
+        }
+
+        List<AhoCorasick.Match> acMatches = rules.ahoCorasick().search(fullyCompressed);
+        boolean acPunished = false;
+        String[] normWords = normalized.split("\\s+");
+
+        for (AhoCorasick.Match match : acMatches) {
+            String pattern = match.pattern();
+            int c_start = match.startIndex();
+            int c_end = match.endIndex();
+
+            int n_start = spaceMap[c_start];
+            int n_end = spaceMap[c_end - 1] + 1;
+            String span = normalized.substring(n_start, n_end);
+
+            boolean isValidViolation = true;
+
+            if (span.contains(" ")) {
+                boolean cutsWord = false;
+
+                if (n_start > 0 && Character.isLetter(normalized.charAt(n_start - 1))) cutsWord = true;
+                if (n_end < normalized.length() && Character.isLetter(normalized.charAt(n_end))) cutsWord = true;
+
+                if (cutsWord) {
+                    isValidViolation = false;
+                } else {
+                    String[] parts = span.split("\\s+");
+                    boolean allAllowed = true;
+                    Set<String> allowedWordsSet = rules.allowedWords();
+                    for (String part : parts) {
+                        if (part.isEmpty()) continue;
+                        if (!allowedWordsSet.contains(part)) {
+                            allAllowed = false;
+                            break;
+                        }
+                    }
+                    if (allAllowed) isValidViolation = false;
+                }
+            }
+
+            if (isValidViolation) {
+                String fullToken = extractFullToken(normalized, n_start, n_end);
+                Set<String> expressiveWordsSet = rules.expressiveWords();
+                if (expressiveWordsSet.contains(fullToken)) {
+                    isValidViolation = false;
+                }
+            }
+
+            if (isValidViolation) {
+                ViolationType finalType = match.type();
+
+                if (finalType == ViolationType.INSULT) {
+                    int tokenStartIdx = findTokenIndex(normWords, n_start);
+                    Set<String> staffTitlesSet = rules.staffTitles();
+                    Set<String> familyWordsSet = rules.familyWords();
+
+                    if (hasStaffContext(normWords, staffTitlesSet, tokenStartIdx)) {
+                        finalType = ViolationType.STAFF_INSULT;
+                    } else if (hasFamilyContext(normWords, familyWordsSet, tokenStartIdx)) {
+                        finalType = ViolationType.FAMILY_INSULT;
+                    }
+                }
+
+                if (hasImmunity(player, finalType)) {
+                    continue;
+                }
+
+                dispatchChatMessage(plugin, player, pm, nm, event, rawText, pattern, finalType, "Found via AC: " + pattern, cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+                acPunished = true;
+                break;
+            }
+        }
+
+        if (acPunished) return;
+
+        String[] rawWords = rawText.toLowerCase().split("\\s+");
+
+        ViolationType detectedType = null;
+        String matchedWord = "";
+        String reasonDetail = "";
+        String rawMatchWord = "";
+        double maxSimilarity = 0.0;
+        String suspectedInsult = "";
+
+        Set<String> allowedWordsSet = rules.allowedWords();
+        Set<String> expressiveWordsSet = rules.expressiveWords();
+        List<String> adultWordsList = rules.adultWords();
+        List<String> insultWordsList = rules.insultWords();
+        Set<String> staffTitlesSet = rules.staffTitles();
+        Set<String> familyWordsSet = rules.familyWords();
+        double highThresholdVal = rules.highThreshold();
+
+        outer:
+        for (int i = 0; i < normWords.length; i++) {
+            final String word = normWords[i];
+            final String rawWord = (i < rawWords.length) ? rawWords[i] : word;
+
+            if (word.isEmpty() || allowedWordsSet.contains(word)) continue;
+
+            if (expressiveWordsSet.contains(word)) {
+                boolean targetedAtPronoun =
+                        (i > 0 && PERSONAL_PRONOUNS.contains(normWords[i - 1])) ||
+                        (i < normWords.length - 1 && PERSONAL_PRONOUNS.contains(normWords[i + 1]));
+                boolean targetedAtStaff = hasStaffContext(normWords, staffTitlesSet, i);
+                boolean targetedAtFamily = hasFamilyContext(normWords, familyWordsSet, i);
+
+                if (targetedAtPronoun || targetedAtStaff || targetedAtFamily) {
+                    ViolationType candType = ViolationType.INSULT;
+                    if (targetedAtStaff) {
+                        candType = ViolationType.STAFF_INSULT;
+                    } else if (targetedAtFamily) {
+                        candType = ViolationType.FAMILY_INSULT;
+                    }
+
+                    if (!hasImmunity(player, candType)) {
+                        matchedWord = word;
+                        rawMatchWord = rawWord;
+                        reasonDetail = "Targeted profanity: " + word;
+                        detectedType = candType;
+                        break outer;
+                    }
+                }
+                continue;
+            }
+
+            ViolationRule adultRule = cfg.rules().get(ViolationType.ADULT_CONTENT);
+            if (adultRule.enabled() && !hasImmunity(player, ViolationType.ADULT_CONTENT)) {
+                for (String adult : adultWordsList) {
+                    if (SimilarityChecker.getSimilarityRatio(word, adult, 0.0) >= highThresholdVal) {
+                        detectedType = ViolationType.ADULT_CONTENT;
+                        matchedWord = adult;
+                        reasonDetail = "Adult content: " + adult;
+                        rawMatchWord = rawWord;
+                        break outer;
+                    }
+                }
+            }
+
+            for (String insult : insultWordsList) {
+                double sim = SimilarityChecker.getSimilarityRatio(word, insult, 0.0);
+                if (sim > maxSimilarity) {
+                    maxSimilarity = sim;
+                    suspectedInsult = insult;
+                    rawMatchWord = rawWord;
+                    if (maxSimilarity >= highThresholdVal) break;
+                }
+            }
+
+            if (maxSimilarity >= highThresholdVal) {
+                ViolationType candType = ViolationType.INSULT;
+                if (hasStaffContext(normWords, staffTitlesSet, i)) {
+                    candType = ViolationType.STAFF_INSULT;
+                } else if (hasFamilyContext(normWords, familyWordsSet, i)) {
+                    candType = ViolationType.FAMILY_INSULT;
+                }
+
+                if (!hasImmunity(player, candType)) {
+                    matchedWord = suspectedInsult;
+                    reasonDetail = "Insult (fuzzy): " + matchedWord;
+                    detectedType = candType;
+                    break outer;
+                }
+            }
+        }
+
+        if (detectedType != null) {
+            dispatchChatMessage(plugin, player, pm, nm, event, rawText, rawMatchWord, detectedType, reasonDetail, cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+        } else if (spamCandidate != null && !hasImmunity(player, ViolationType.SPAM)) {
+            dispatchChatMessage(plugin, player, pm, nm, event, rawText, rawText, ViolationType.SPAM, "Spam", cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+        } else if (capsCandidate != null && !hasImmunity(player, ViolationType.CAPS)) {
+            dispatchChatMessage(plugin, player, pm, nm, event, rawText, rawText, ViolationType.CAPS, "Caps", cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+        } else if (maxSimilarity >= rules.mediumThreshold() && maxSimilarity < highThresholdVal) {
+            if (rules.auditMode() || cfg.consoleLog()) {
+                String prefix = rules.auditMode() ? "[AUDIT-MODE | SUSPICIOUS]" : "[SUSPICIOUS]";
+                suspiciousLogger.warning(String.format(
+                        "%s Player: %s | Text: '%s' | Suspicion: '%s' (%.0f%%)",
+                        prefix, player.getName(), rawText, suspectedInsult, maxSimilarity * 100));
+            }
+        }
+    }
+
+    private static void processCommand(JavaPlugin plugin, Player player, String rawText, String fullCommand,
+                                       PlayerCommandPreprocessEvent event, PunishmentManager pm,
+                                       NotificationManager nm, Logger suspiciousLogger, Logger maliciousLogger) {
+        final ChatRulesCache rules = cachedRules;
+        final GlobalConfig cfg = cachedConfig;
+
+        String normalized = TextNormalizer.normalize(rawText);
+        String fullyCompressed = TextNormalizer.removeSpaces(normalized);
+        int[] spaceMap = TextNormalizer.createSpaceMapping(normalized);
+
+        ViolationType spamCandidate = null;
+        boolean spamEnabled = rules.spamModuleEnabled();
+        if (spamEnabled && checkAndRecordSpam(player.getUniqueId(), normalized, rules.spamMaxCount(), rules.spamWindowMs(), rules.spamSimThreshold())) {
+            spamCandidate = ViolationType.SPAM;
+        }
+
+        ViolationType capsCandidate = null;
+        boolean capsEnabled = rules.capsModuleEnabled();
+        if (capsEnabled && isCaps(rawText, rules.capsMinLength(), rules.capsMinPct())) {
+            capsCandidate = ViolationType.CAPS;
+        }
+
+        String domainNormalized = TextNormalizer.normalizeForDomain(rawText);
+        boolean hasLinkBypass = domainNormalized.contains("http") || domainNormalized.contains("www");
+        boolean hasIpMatch = containsIP(rawText);
+        Pattern domainPatternVal = rules.domainPattern();
+        boolean hasDomainMatch = domainPatternVal.matcher(domainNormalized).find();
+
+        if (hasIpMatch || hasDomainMatch || hasLinkBypass) {
+            ViolationType detected = ViolationType.ADVERTISEMENT;
+            String reason = "IP/Link/Domain";
+
+            List<String> socialMediaList = rules.socialWords();
+            for (String social : socialMediaList) {
+                String lowerSocial = social.toLowerCase();
+                if (domainNormalized.contains(lowerSocial)) {
+                    detected = ViolationType.SOCIAL_MEDIA;
+                    reason = "Social Media Link: " + social;
+                    break;
+                }
+            }
+
+            if (!hasImmunity(player, detected)) {
+                dispatchCommand(plugin, player, pm, nm, event, fullCommand, rawText, rawText, detected, reason, cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+                return;
+            }
+        }
+
+        List<AhoCorasick.Match> acMatches = rules.ahoCorasick().search(fullyCompressed);
+        boolean acPunished = false;
+        String[] normWords = normalized.split("\\s+");
+
+        for (AhoCorasick.Match match : acMatches) {
+            String pattern = match.pattern();
+            int c_start = match.startIndex();
+            int c_end = match.endIndex();
+
+            int n_start = spaceMap[c_start];
+            int n_end = spaceMap[c_end - 1] + 1;
+            String span = normalized.substring(n_start, n_end);
+
+            boolean isValidViolation = true;
+
+            if (span.contains(" ")) {
+                boolean cutsWord = false;
+
+                if (n_start > 0 && Character.isLetter(normalized.charAt(n_start - 1))) cutsWord = true;
+                if (n_end < normalized.length() && Character.isLetter(normalized.charAt(n_end))) cutsWord = true;
+
+                if (cutsWord) {
+                    isValidViolation = false;
+                } else {
+                    String[] parts = span.split("\\s+");
+                    boolean allAllowed = true;
+                    Set<String> allowedWordsSet = rules.allowedWords();
+                    for (String part : parts) {
+                        if (part.isEmpty()) continue;
+                        if (!allowedWordsSet.contains(part)) {
+                            allAllowed = false;
+                            break;
+                        }
+                    }
+                    if (allAllowed) isValidViolation = false;
+                }
+            }
+
+            if (isValidViolation) {
+                String fullToken = extractFullToken(normalized, n_start, n_end);
+                Set<String> expressiveWordsSet = rules.expressiveWords();
+                if (expressiveWordsSet.contains(fullToken)) {
+                    isValidViolation = false;
+                }
+            }
+
+            if (isValidViolation) {
+                ViolationType finalType = match.type();
+
+                if (finalType == ViolationType.INSULT) {
+                    int tokenStartIdx = findTokenIndex(normWords, n_start);
+                    Set<String> staffTitlesSet = rules.staffTitles();
+                    Set<String> familyWordsSet = rules.familyWords();
+
+                    if (hasStaffContext(normWords, staffTitlesSet, tokenStartIdx)) {
+                        finalType = ViolationType.STAFF_INSULT;
+                    } else if (hasFamilyContext(normWords, familyWordsSet, tokenStartIdx)) {
+                        finalType = ViolationType.FAMILY_INSULT;
+                    }
+                }
+
+                if (hasImmunity(player, finalType)) {
+                    continue;
+                }
+
+                dispatchCommand(plugin, player, pm, nm, event, fullCommand, rawText, pattern, finalType, "Found via AC: " + pattern, cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+                acPunished = true;
+                break;
+            }
+        }
+
+        if (acPunished) return;
+
+        String[] rawWords = rawText.toLowerCase().split("\\s+");
+
+        ViolationType detectedType = null;
+        String matchedWord = "";
+        String reasonDetail = "";
+        String rawMatchWord = "";
+        double maxSimilarity = 0.0;
+        String suspectedInsult = "";
+
+        Set<String> allowedWordsSet = rules.allowedWords();
+        Set<String> expressiveWordsSet = rules.expressiveWords();
+        List<String> adultWordsList = rules.adultWords();
+        List<String> insultWordsList = rules.insultWords();
+        Set<String> staffTitlesSet = rules.staffTitles();
+        Set<String> familyWordsSet = rules.familyWords();
+        double highThresholdVal = rules.highThreshold();
+
+        outer:
+        for (int i = 0; i < normWords.length; i++) {
+            final String word = normWords[i];
+            final String rawWord = (i < rawWords.length) ? rawWords[i] : word;
+
+            if (word.isEmpty() || allowedWordsSet.contains(word)) continue;
+
+            if (expressiveWordsSet.contains(word)) {
+                boolean targetedAtPronoun =
+                        (i > 0 && PERSONAL_PRONOUNS.contains(normWords[i - 1])) ||
+                        (i < normWords.length - 1 && PERSONAL_PRONOUNS.contains(normWords[i + 1]));
+                boolean targetedAtStaff = hasStaffContext(normWords, staffTitlesSet, i);
+                boolean targetedAtFamily = hasFamilyContext(normWords, familyWordsSet, i);
+
+                if (targetedAtPronoun || targetedAtStaff || targetedAtFamily) {
+                    ViolationType candType = ViolationType.INSULT;
+                    if (targetedAtStaff) {
+                        candType = ViolationType.STAFF_INSULT;
+                    } else if (targetedAtFamily) {
+                        candType = ViolationType.FAMILY_INSULT;
+                    }
+
+                    if (!hasImmunity(player, candType)) {
+                        matchedWord = word;
+                        rawMatchWord = rawWord;
+                        reasonDetail = "Targeted profanity: " + word;
+                        detectedType = candType;
+                        break outer;
+                    }
+                }
+                continue;
+            }
+
+            ViolationRule adultRule = cfg.rules().get(ViolationType.ADULT_CONTENT);
+            if (adultRule.enabled() && !hasImmunity(player, ViolationType.ADULT_CONTENT)) {
+                for (String adult : adultWordsList) {
+                    if (SimilarityChecker.getSimilarityRatio(word, adult, 0.0) >= highThresholdVal) {
+                        detectedType = ViolationType.ADULT_CONTENT;
+                        matchedWord = adult;
+                        reasonDetail = "Adult content: " + adult;
+                        rawMatchWord = rawWord;
+                        break outer;
+                    }
+                }
+            }
+
+            for (String insult : insultWordsList) {
+                double sim = SimilarityChecker.getSimilarityRatio(word, insult, 0.0);
+                if (sim > maxSimilarity) {
+                    maxSimilarity = sim;
+                    suspectedInsult = insult;
+                    rawMatchWord = rawWord;
+                    if (maxSimilarity >= highThresholdVal) break;
+                }
+            }
+
+            if (maxSimilarity >= highThresholdVal) {
+                ViolationType candType = ViolationType.INSULT;
+                if (hasStaffContext(normWords, staffTitlesSet, i)) {
+                    candType = ViolationType.STAFF_INSULT;
+                } else if (hasFamilyContext(normWords, familyWordsSet, i)) {
+                    candType = ViolationType.FAMILY_INSULT;
+                }
+
+                if (!hasImmunity(player, candType)) {
+                    matchedWord = suspectedInsult;
+                    reasonDetail = "Insult (fuzzy): " + matchedWord;
+                    detectedType = candType;
+                    break outer;
+                }
+            }
+        }
+
+        if (detectedType != null) {
+            dispatchCommand(plugin, player, pm, nm, event, fullCommand, rawText, rawMatchWord, detectedType, reasonDetail, cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+        } else if (spamCandidate != null && !hasImmunity(player, ViolationType.SPAM)) {
+            dispatchCommand(plugin, player, pm, nm, event, fullCommand, rawText, rawText, ViolationType.SPAM, "Spam", cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+        } else if (capsCandidate != null && !hasImmunity(player, ViolationType.CAPS)) {
+            dispatchCommand(plugin, player, pm, nm, event, fullCommand, rawText, rawText, ViolationType.CAPS, "Caps", cfg, rules.auditMode(), suspiciousLogger, maliciousLogger);
+        } else if (maxSimilarity >= rules.mediumThreshold() && maxSimilarity < highThresholdVal) {
+            if (rules.auditMode() || cfg.consoleLog()) {
+                String prefix = rules.auditMode() ? "[AUDIT-MODE | SUSPICIOUS]" : "[SUSPICIOUS]";
+                suspiciousLogger.warning(String.format(
+                        "%s Player: %s | Text: '%s' | Suspicion: '%s' (%.0f%%)",
+                        prefix, player.getName(), rawText, suspectedInsult, maxSimilarity * 100));
+            }
+        }
+    }
+
+    private static void dispatchChatMessage(Plugin plugin, Player player, PunishmentManager pm, NotificationManager nm,
+                                           PacketReceiveEvent event, String rawText, String badWord,
+                                           ViolationType type, String reasonDetail, GlobalConfig cfg,
+                                           boolean auditMode, Logger suspiciousLogger, Logger maliciousLogger) {
         if (hasImmunity(player, type)) return;
 
         ViolationRule rule = cfg.rules().get(type);
@@ -567,8 +836,11 @@ public class NetworkChatInterceptor {
             nm.sendViolationAlert(player, type, badWord, rawText);
         }
 
+        boolean isBlocked = rule.block();
+        boolean isCensored = rule.censor();
+
         String finalMessage = rawText;
-        if (rule.censor() && !rule.block()) {
+        if (isCensored && !isBlocked) {
             if (type == ViolationType.CAPS) {
                 finalMessage = finalMessage.toLowerCase();
             } else if (!badWord.isEmpty()) {
@@ -580,17 +852,88 @@ public class NetworkChatInterceptor {
         }
         final String fMsg = finalMessage;
 
-        if (isChatMsg) {
-            if (rule.block()) pendingBlockMessages.add(player.getUniqueId());
-            else if (rule.censor()) pendingCensorMessages.put(player.getUniqueId(), fMsg);
+        if (isBlocked) {
+            event.setCancelled(true);
+            pendingBlockMessages.add(player.getUniqueId());
+        } else if (isCensored) {
+            pendingCensorMessages.put(player.getUniqueId(), fMsg);
         }
 
+        handlePunishmentAndMessages(plugin, player, pm, rule, type, reasonDetail, badWord, isBlocked, isCensored, cfg);
+    }
+
+    private static void dispatchCommand(Plugin plugin, Player player, PunishmentManager pm, NotificationManager nm,
+                                       PlayerCommandPreprocessEvent event, String fullCommand, String rawText,
+                                       String badWord, ViolationType type, String reasonDetail, GlobalConfig cfg,
+                                       boolean auditMode, Logger suspiciousLogger, Logger maliciousLogger) {
+        if (hasImmunity(player, type)) return;
+
+        ViolationRule rule = cfg.rules().get(type);
+        if (!rule.enabled()) return;
+
+        if (auditMode) {
+            maliciousLogger.warning(String.format(
+                "[AUDIT-MODE | MALICIOUS] Player: %s | Violation: %s | Detail: %s | Word: '%s' | Message: '%s'",
+                player.getName(), type.name(), reasonDetail, badWord, rawText
+            ));
+            return;
+        }
+
+        if (cfg.consoleLog()) {
+            maliciousLogger.warning(String.format(
+                "[MALICIOUS] Player: %s | Violation: %s | Detail: %s | Word: '%s' | Message: '%s'",
+                player.getName(), type.name(), reasonDetail, badWord, rawText
+            ));
+        }
+
+        if (cfg.notifiesEnabled()) {
+            nm.sendViolationAlert(player, type, badWord, rawText);
+        }
+
+        boolean isBlocked = rule.block();
+        boolean isCensored = rule.censor();
+
+        String finalMessage = rawText;
+        if (isCensored && !isBlocked) {
+            if (type == ViolationType.CAPS) {
+                finalMessage = finalMessage.toLowerCase();
+            } else if (!badWord.isEmpty()) {
+                finalMessage = finalMessage.replaceAll("(?i)" + Pattern.quote(badWord), "***");
+                if (finalMessage.equals(rawText)) finalMessage = "***";
+            } else {
+                finalMessage = "***";
+            }
+        }
+        final String fMsg = finalMessage;
+
+        if (isBlocked) {
+            event.setCancelled(true);
+        } else if (isCensored) {
+            if (!rawText.isEmpty() && fullCommand.contains(rawText)) {
+                String censoredCmd = fullCommand.replace(rawText, fMsg);
+                if (!censoredCmd.startsWith("/")) {
+                    censoredCmd = "/" + censoredCmd;
+                }
+                event.setMessage(censoredCmd);
+            }
+        }
+
+        handlePunishmentAndMessages(plugin, player, pm, rule, type, reasonDetail, badWord, isBlocked, isCensored, cfg);
+    }
+
+    private static void handlePunishmentAndMessages(Plugin plugin, Player player, PunishmentManager pm,
+                                                    ViolationRule rule, ViolationType type, String reasonDetail,
+                                                    String badWord, boolean isBlocked, boolean isCensored,
+                                                    GlobalConfig cfg) {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if (externallyMutedPlayers.contains(player.getUniqueId())) return;
             boolean executePunishment = true;
             String warnMsgToSend = null;
 
-            if (cfg.warnsIsEnabled() && cfg.warnLimitIsEnabled()) {
+            boolean punishEnabled = rule.punishEnabled();
+            boolean warnsIsEnabled = cfg.warnsIsEnabled();
+            boolean warnLimitIsEnabled = cfg.warnLimitIsEnabled();
+
+            if (punishEnabled && warnsIsEnabled && warnLimitIsEnabled) {
                 UUID uuid = player.getUniqueId();
                 StoredViolation currentViolation = new StoredViolation(type, rule, reasonDetail, badWord);
 
@@ -602,7 +945,8 @@ public class NetworkChatInterceptor {
                 int warns = warnCounts.getOrDefault(uuid, 0) + 1;
                 warnCounts.put(uuid, warns);
 
-                if (cfg.tempWarns()) {
+                boolean tempWarns = cfg.tempWarns();
+                if (tempWarns) {
                     long resetTicks = parseTimeToTicks(cfg.warnResetTime());
                     BukkitTask old = resetTasks.remove(uuid);
                     if (old != null) old.cancel();
@@ -623,29 +967,30 @@ public class NetworkChatInterceptor {
                     resetTasks.put(uuid, task);
                 }
 
-                if (warns <= cfg.warnLimit()) {
+                int warnLimit = cfg.warnLimit();
+                if (warns <= warnLimit) {
                     executePunishment = false;
-                    warnMsgToSend = warns < cfg.warnLimit() ? cfg.warnMessage() : cfg.lastWarnMessage();
+                    warnMsgToSend = warns < warnLimit ? cfg.warnMessage() : cfg.lastWarnMessage();
                     if (cfg.consoleLog()) {
-                        plugin.getLogger().info(logLine("WARN", warns + "/" + cfg.warnLimit(), player.getName(), reasonDetail, badWord));
+                        plugin.getLogger().info(logLine("WARN", warns + "/" + warnLimit, player.getName(), reasonDetail, badWord));
                     }
                 } else {
                     warnCounts.put(uuid, 0);
                 }
             }
 
-            if (rule.block()) {
-                if (!externallyMutedPlayers.contains(player.getUniqueId())) sendMultilineMessage(player, rule.blockReason());
-            } else if (rule.censor() && isChatMsg) {
-                if (!externallyMutedPlayers.contains(player.getUniqueId())) sendMultilineMessage(player, rule.censorReason());
+            if (isBlocked) {
+                sendMultilineMessage(player, rule.blockReason());
+            } else if (isCensored) {
+                sendMultilineMessage(player, rule.censorReason());
             }
 
-            if (warnMsgToSend != null && !externallyMutedPlayers.contains(player.getUniqueId())) {
+            if (warnMsgToSend != null) {
                 sendMultilineMessage(player, warnMsgToSend);
             }
 
-            if (executePunishment && rule.punishEnabled()) {
-                StoredViolation heaviest = (cfg.warnsIsEnabled() && cfg.warnLimitIsEnabled()) ? highestViolations.remove(player.getUniqueId()) : null;
+            if (executePunishment && punishEnabled) {
+                StoredViolation heaviest = (warnsIsEnabled && warnLimitIsEnabled) ? highestViolations.remove(player.getUniqueId()) : null;
                 if (heaviest != null) {
                     applyPunishment(plugin, player, pm, heaviest.rule(), heaviest.reasonDetail(), heaviest.badWord(), cfg.consoleLog());
                 } else {
@@ -674,6 +1019,30 @@ public class NetworkChatInterceptor {
         if (consoleLog) {
             plugin.getLogger().info(logLine(type.toUpperCase(java.util.Locale.ROOT), rule.duration(), player.getName(), detail, word));
         }
+    }
+
+    private static String extractFullToken(String text, int start, int end) {
+        int left = start;
+        while (left > 0 && !Character.isWhitespace(text.charAt(left - 1))) {
+            left--;
+        }
+        int right = end;
+        while (right < text.length() && !Character.isWhitespace(text.charAt(right))) {
+            right++;
+        }
+        return text.substring(left, right);
+    }
+
+    private static int findTokenIndex(String[] normWords, int charOffset) {
+        int charCount = 0;
+        for (int j = 0; j < normWords.length; j++) {
+            charCount += normWords[j].length();
+            if (charCount > charOffset) {
+                return j;
+            }
+            charCount++;
+        }
+        return 0;
     }
 
     private static boolean hasStaffContext(String[] normWords, Set<String> staffTitles, int insultIndex) {
@@ -740,29 +1109,51 @@ public class NetworkChatInterceptor {
     }
 
     private static void sendMultilineMessage(Player player, String message) {
-        String colored = colorize(message.trim());
-        for (String line : NEWLINE_PATTERN.split(colored)) {
-            String t = line.trim();
-            if (!t.isEmpty()) player.sendMessage(t);
+    if (message == null || message.isBlank()) return;
+
+    String[] lines = NEWLINE_PATTERN.split(message.trim());
+
+    for (String line : lines) {
+        String trimmedLine = line.trim();
+
+        if (!trimmedLine.isEmpty()) {
+            MessageUtil.send(player, trimmedLine);
         }
     }
+}
 
     private static String logLine(String action, String duration, String name, String detail, String word) {
         return "[A.P.V.E.] " + action + " " + duration + " → " + name + " [" + detail + (word.isEmpty() ? "" : " | '" + word + "'") + "]";
     }
 
-    private static String extractRawText(PacketReceiveEvent event, boolean isChatMsg, boolean isChatCmd, Set<String> interceptedCommands) {
-        if (isChatMsg) return new WrapperPlayClientChatMessage(event).getMessage();
-        if (isChatCmd) {
-            WrapperPlayClientChatCommand wrapper = new WrapperPlayClientChatCommand(event);
-            String command = wrapper.getCommand();
-            if (command.isEmpty()) return "";
-            String[] parts = command.split(" ", 2);
-            String cmd = parts[0].toLowerCase();
-            String args = parts.length > 1 ? parts[1] : "";
-            if (interceptedCommands.contains(cmd)) return extractMessageFromArgs(cmd, args);
+    private static String extractRawTextFromCommand(String fullCommand, Set<String> interceptedCommands) {
+        if (fullCommand == null || fullCommand.isBlank()) {
+            return "";
         }
-        return "";
+
+        String commandStr = fullCommand.trim();
+        if (commandStr.startsWith("/")) {
+            commandStr = commandStr.substring(1).trim();
+        }
+
+        String[] parts = commandStr.split("\\s+", 2);
+        String cmd = parts[0].toLowerCase(java.util.Locale.ROOT);
+        String args = parts.length > 1 ? parts[1] : "";
+
+        boolean isIntercepted = false;
+        for (String ic : interceptedCommands) {
+            String cleanIc = ic.startsWith("/") ? ic.substring(1).toLowerCase(java.util.Locale.ROOT) : ic.toLowerCase(java.util.Locale.ROOT);
+            if (cleanIc.equals(cmd)) {
+                isIntercepted = true;
+                break;
+            }
+        }
+
+        if (!isIntercepted) {
+            return "";
+        }
+
+        return extractMessageFromArgs(cmd, args);
     }
 
     private static boolean containsIP(String text) {
@@ -770,10 +1161,18 @@ public class NetworkChatInterceptor {
     }
 
     private static String extractMessageFromArgs(String command, String args) {
-        if (args.isEmpty()) return "";
-        if (command.equalsIgnoreCase("r") || command.equalsIgnoreCase("reply")) return args;
-        String[] parts = args.split(" ", 2);
-        return parts.length > 1 ? parts[1] : "";
+        if (args.isBlank()) {
+            return "";
+        }
+
+        String cleanCmd = command.startsWith("/") ? command.substring(1).toLowerCase(java.util.Locale.ROOT) : command.toLowerCase(java.util.Locale.ROOT);
+
+        if (TARGET_PLAYER_COMMANDS.contains(cleanCmd)) {
+            String[] parts = args.trim().split("\\s+", 2);
+            return parts.length > 1 ? parts[1] : "";
+        }
+
+        return args.trim();
     }
 
     public static int getWarns(UUID uuid) { return warnCounts.getOrDefault(uuid, 0); }
@@ -798,156 +1197,177 @@ public class NetworkChatInterceptor {
         StoredViolation v = highestViolations.get(uuid);
         return v != null ? v.type().name() : "NONE";
     }
+
     public record InspectionResult(
-    String rawText,
-    String normalizedText,
-    String violationType,
-    String matchedInputWord,
-    String matchedDictWord,
-    String detail
-) {}
+        String rawText,
+        String normalizedText,
+        String violationType,
+        String matchedInputWord,
+        String matchedDictWord,
+        String detail
+    ) {}
 
-public static InspectionResult inspect(String rawText) {
-    String normalized = TextNormalizer.normalize(rawText);
-    String fullyCompressed = TextNormalizer.removeSpaces(normalized);
-    int[] spaceMap = TextNormalizer.createSpaceMapping(normalized);
+    public static InspectionResult inspect(String rawText) {
+        String normalized = TextNormalizer.normalize(rawText);
+        String fullyCompressed = TextNormalizer.removeSpaces(normalized);
+        int[] spaceMap = TextNormalizer.createSpaceMapping(normalized);
 
-    ChatRulesCache rules = cachedRules;
+        ChatRulesCache rules = cachedRules;
 
-    String domainNormalized = TextNormalizer.normalizeForDomain(rawText);
-    if (containsIP(rawText) || rules.domainPattern().matcher(domainNormalized).find() || domainNormalized.contains("http") || domainNormalized.contains("www")) {
-        String detected = "ADVERTISEMENT";
-        String dictWord = "Domain/IP Pattern";
-        for (String social : rules.socialWords()) {
-            if (domainNormalized.contains(social.toLowerCase())) {
-                detected = "SOCIAL_MEDIA";
-                dictWord = social;
-                break;
-            }
-        }
-        return new InspectionResult(rawText, normalized, "MALICIOUS", rawText, dictWord, "Type: " + detected + " | Link or IP pattern");
-    }
+        String domainNormalized = TextNormalizer.normalizeForDomain(rawText);
+        boolean hasLinkBypass = domainNormalized.contains("http") || domainNormalized.contains("www");
+        boolean hasIpMatch = containsIP(rawText);
+        Pattern domainPatternVal = rules.domainPattern();
+        boolean hasDomainMatch = domainPatternVal.matcher(domainNormalized).find();
 
-    List<AhoCorasick.Match> acMatches = rules.ahoCorasick().search(fullyCompressed);
-    for (AhoCorasick.Match match : acMatches) {
-        String pattern = match.pattern();
-        int c_start = match.startIndex();
-        int c_end = match.endIndex();
+        if (hasIpMatch || hasDomainMatch || hasLinkBypass) {
+            String detected = "ADVERTISEMENT";
+            String dictWord = "Domain/IP Pattern";
 
-        int n_start = spaceMap[c_start];
-        int n_end = spaceMap[c_end - 1] + 1;
-        String span = normalized.substring(n_start, n_end);
-
-        boolean isValid = true;
-        if (span.contains(" ")) {
-            boolean cutsWord = (n_start > 0 && Character.isLetter(normalized.charAt(n_start - 1))) ||
-                               (n_end < normalized.length() && Character.isLetter(normalized.charAt(n_end)));
-            if (cutsWord) {
-                isValid = false;
-            } else {
-                String[] parts = span.split("\\s+");
-                boolean allAllowed = true;
-                for (String part : parts) {
-                    if (!part.isEmpty() && !rules.allowedWords().contains(part)) {
-                        allAllowed = false;
-                        break;
-                    }
+            List<String> socialMediaList = rules.socialWords();
+            for (String social : socialMediaList) {
+                String lowerSocial = social.toLowerCase();
+                if (domainNormalized.contains(lowerSocial)) {
+                    detected = "SOCIAL_MEDIA";
+                    dictWord = social;
+                    break;
                 }
-                if (allAllowed) isValid = false;
             }
+            return new InspectionResult(rawText, normalized, "MALICIOUS", rawText, dictWord, "Type: " + detected + " | Link or IP pattern");
         }
 
-        if (isValid) {
-            ViolationType type = match.type();
-            if (type == ViolationType.INSULT) {
-                String[] normWords = normalized.split("\\s+");
-                int tokenStartIdx = 0;
-                int charCount = 0;
-                for (int j = 0; j < normWords.length; j++) {
-                    charCount += normWords[j].length();
-                    if (charCount > n_start) {
-                        tokenStartIdx = j;
-                        break;
+        String[] normWords = normalized.split("\\s+");
+
+        List<AhoCorasick.Match> acMatches = rules.ahoCorasick().search(fullyCompressed);
+        for (AhoCorasick.Match match : acMatches) {
+            String pattern = match.pattern();
+            int c_start = match.startIndex();
+            int c_end = match.endIndex();
+
+            int n_start = spaceMap[c_start];
+            int n_end = spaceMap[c_end - 1] + 1;
+            String span = normalized.substring(n_start, n_end);
+
+            boolean isValid = true;
+            if (span.contains(" ")) {
+                boolean cutsWord = (n_start > 0 && Character.isLetter(normalized.charAt(n_start - 1))) ||
+                                   (n_end < normalized.length() && Character.isLetter(normalized.charAt(n_end)));
+                if (cutsWord) {
+                    isValid = false;
+                } else {
+                    String[] parts = span.split("\\s+");
+                    boolean allAllowed = true;
+                    Set<String> allowedWordsSet = rules.allowedWords();
+                    for (String part : parts) {
+                        if (!part.isEmpty() && !allowedWordsSet.contains(part)) {
+                            allAllowed = false;
+                            break;
+                        }
                     }
-                    charCount++;
+                    if (allAllowed) isValid = false;
                 }
-                if (hasStaffContext(normWords, rules.staffTitles(), tokenStartIdx)) type = ViolationType.STAFF_INSULT;
-                else if (hasFamilyContext(normWords, rules.familyWords(), tokenStartIdx)) type = ViolationType.FAMILY_INSULT;
             }
-            return new InspectionResult(rawText, normalized, "MALICIOUS", span, pattern, "Type: " + type.name() + " | AC Match");
-        }
-    }
 
-    String[] normWords = normalized.split("\\s+");
-    String[] rawWords = rawText.toLowerCase().split("\\s+");
+            if (isValid) {
+                String fullToken = extractFullToken(normalized, n_start, n_end);
+                Set<String> expressiveWordsSet = rules.expressiveWords();
+                if (expressiveWordsSet.contains(fullToken)) {
+                    isValid = false;
+                }
+            }
 
-    double maxSuspiciousSim = 0.0;
-    String suspiciousInputWord = "";
-    String suspiciousDictWord = "";
-
-    for (int i = 0; i < normWords.length; i++) {
-        String word = normWords[i];
-        String rawWord = (i < rawWords.length) ? rawWords[i] : word;
-
-        if (word.isEmpty() || rules.allowedWords().contains(word)) continue;
-
-        for (String adult : rules.adultWords()) {
-            double sim = SimilarityChecker.getSimilarityRatio(word, adult, 0.0);
-            if (sim >= rules.highThreshold()) {
-                return new InspectionResult(rawText, normalized, "MALICIOUS", rawWord, adult, "Type: ADULT_CONTENT | Fuzzy Match Adult");
+            if (isValid) {
+                ViolationType type = match.type();
+                if (type == ViolationType.INSULT) {
+                    int tokenStartIdx = findTokenIndex(normWords, n_start);
+                    Set<String> staffTitlesSet = rules.staffTitles();
+                    Set<String> familyWordsSet = rules.familyWords();
+                    if (hasStaffContext(normWords, staffTitlesSet, tokenStartIdx)) type = ViolationType.STAFF_INSULT;
+                    else if (hasFamilyContext(normWords, familyWordsSet, tokenStartIdx)) type = ViolationType.FAMILY_INSULT;
+                }
+                return new InspectionResult(rawText, normalized, "MALICIOUS", span, pattern, "Type: " + type.name() + " | AC Match");
             }
         }
 
-        double maxSim = 0.0;
-        String bestInsult = "";
-        for (String insult : rules.insultWords()) {
-            double sim = SimilarityChecker.getSimilarityRatio(word, insult, 0.0);
-            if (sim > maxSim) {
-                maxSim = sim;
-                bestInsult = insult;
+        String[] rawWords = rawText.toLowerCase().split("\\s+");
+
+        double maxSuspiciousSim = 0.0;
+        String suspiciousInputWord = "";
+        String suspiciousDictWord = "";
+
+        Set<String> allowedWordsSet = rules.allowedWords();
+        Set<String> expressiveWordsSet = rules.expressiveWords();
+        List<String> adultWordsList = rules.adultWords();
+        List<String> insultWordsList = rules.insultWords();
+        Set<String> staffTitlesSet = rules.staffTitles();
+        Set<String> familyWordsSet = rules.familyWords();
+        double highThresholdVal = rules.highThreshold();
+
+        for (int i = 0; i < normWords.length; i++) {
+            String word = normWords[i];
+            String rawWord = (i < rawWords.length) ? rawWords[i] : word;
+
+            if (word.isEmpty() || allowedWordsSet.contains(word)) continue;
+
+            if (expressiveWordsSet.contains(word)) {
+                boolean targetedAtPronoun = (i > 0 && PERSONAL_PRONOUNS.contains(normWords[i - 1])) ||
+                                            (i < normWords.length - 1 && PERSONAL_PRONOUNS.contains(normWords[i + 1]));
+                boolean targetedAtStaff = hasStaffContext(normWords, staffTitlesSet, i);
+                boolean targetedAtFamily = hasFamilyContext(normWords, familyWordsSet, i);
+
+                if (targetedAtPronoun || targetedAtStaff || targetedAtFamily) {
+                    ViolationType cand = ViolationType.INSULT;
+                    if (targetedAtStaff) cand = ViolationType.STAFF_INSULT;
+                    else if (targetedAtFamily) cand = ViolationType.FAMILY_INSULT;
+
+                    return new InspectionResult(rawText, normalized, "MALICIOUS", rawWord, word, "Type: " + cand.name() + " | Targeted profanity");
+                }
+                continue;
             }
-        }
 
-        if (maxSim >= rules.highThreshold()) {
-            ViolationType cand = ViolationType.INSULT;
-            if (hasStaffContext(normWords, rules.staffTitles(), i)) cand = ViolationType.STAFF_INSULT;
-            else if (hasFamilyContext(normWords, rules.familyWords(), i)) cand = ViolationType.FAMILY_INSULT;
-
-            return new InspectionResult(rawText, normalized, "MALICIOUS", rawWord, bestInsult, String.format("Type: %s | Fuzzy Insult (%.0f%%)", cand.name(), maxSim * 100));
-        }
-
-        if (maxSim >= rules.mediumThreshold()) {
-            if (maxSim > maxSuspiciousSim) {
-                maxSuspiciousSim = maxSim;
-                suspiciousInputWord = rawWord;
-                suspiciousDictWord = bestInsult;
+            for (String adult : adultWordsList) {
+                double sim = SimilarityChecker.getSimilarityRatio(word, adult, 0.0);
+                if (sim >= highThresholdVal) {
+                    return new InspectionResult(rawText, normalized, "MALICIOUS", rawWord, adult, "Type: ADULT_CONTENT | Fuzzy Match Adult");
+                }
             }
-        }
 
-        if (rules.expressiveWords().contains(word)) {
-            boolean targetedAtPronoun = (i > 0 && PERSONAL_PRONOUNS.contains(normWords[i - 1])) ||
-                                        (i < normWords.length - 1 && PERSONAL_PRONOUNS.contains(normWords[i + 1]));
-            boolean targetedAtStaff = hasStaffContext(normWords, rules.staffTitles(), i);
-            boolean targetedAtFamily = hasFamilyContext(normWords, rules.familyWords(), i);
+            double maxSim = 0.0;
+            String bestInsult = "";
+            for (String insult : insultWordsList) {
+                double sim = SimilarityChecker.getSimilarityRatio(word, insult, 0.0);
+                if (sim > maxSim) {
+                    maxSim = sim;
+                    bestInsult = insult;
+                }
+            }
 
-            if (targetedAtPronoun || targetedAtStaff || targetedAtFamily) {
+            if (maxSim >= highThresholdVal) {
                 ViolationType cand = ViolationType.INSULT;
-                if (targetedAtStaff) cand = ViolationType.STAFF_INSULT;
-                else if (targetedAtFamily) cand = ViolationType.FAMILY_INSULT;
+                if (hasStaffContext(normWords, staffTitlesSet, i)) cand = ViolationType.STAFF_INSULT;
+                else if (hasFamilyContext(normWords, familyWordsSet, i)) cand = ViolationType.FAMILY_INSULT;
 
-                return new InspectionResult(rawText, normalized, "MALICIOUS", rawWord, word, "Type: " + cand.name() + " | Targeted profanity");
+                return new InspectionResult(rawText, normalized, "MALICIOUS", rawWord, bestInsult, String.format("Type: %s | Fuzzy Insult (%.0f%%)", cand.name(), maxSim * 100));
+            }
+
+            if (maxSim >= rules.mediumThreshold()) {
+                if (maxSim > maxSuspiciousSim) {
+                    maxSuspiciousSim = maxSim;
+                    suspiciousInputWord = rawWord;
+                    suspiciousDictWord = bestInsult;
+                }
             }
         }
-    }
 
-    if (rules.capsModuleEnabled() && isCaps(rawText, rules.capsMinLength(), rules.capsMinPct())) {
-        return new InspectionResult(rawText, normalized, "MALICIOUS", rawText, "-", "Type: CAPS | Caps Threshold");
-    }
+        boolean capsEnabled = rules.capsModuleEnabled();
+        if (capsEnabled && isCaps(rawText, rules.capsMinLength(), rules.capsMinPct())) {
+            return new InspectionResult(rawText, normalized, "MALICIOUS", rawText, "-", "Type: CAPS | Caps Threshold");
+        }
 
-    if (maxSuspiciousSim > 0.0) {
-        return new InspectionResult(rawText, normalized, "SUSPICIOUS", suspiciousInputWord, suspiciousDictWord, String.format("Similarity above medium threshold (%.0f%%)", maxSuspiciousSim * 100));
-    }
+        if (maxSuspiciousSim > 0.0) {
+            return new InspectionResult(rawText, normalized, "SUSPICIOUS", suspiciousInputWord, suspiciousDictWord, String.format("Similarity above medium threshold (%.0f%%)", maxSuspiciousSim * 100));
+        }
 
-    return new InspectionResult(rawText, normalized, "NONE", "-", "-", "Similarity below medium threshold");
+        return new InspectionResult(rawText, normalized, "NONE", "-", "-", "Similarity below medium threshold");
     }
 }

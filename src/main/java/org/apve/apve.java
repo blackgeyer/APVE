@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.logging.FileHandler;
@@ -31,7 +30,7 @@ public class apve extends JavaPlugin implements Listener {
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().getSettings()
-                .reEncodeByDefault(true)  
+                .reEncodeByDefault(true)
                 .checkForUpdates(false);
         PacketEvents.getAPI().load();
     }
@@ -39,7 +38,9 @@ public class apve extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        checkConfigForDefault();
+
+        LocalizationManager localizationManager = new LocalizationManager(this);
+        localizationManager.applyLocalization();
 
         YamlConfiguration yamlConfig = (YamlConfiguration) getConfig();
 
@@ -63,7 +64,7 @@ public class apve extends JavaPlugin implements Listener {
             if (maxSeverity < 4) {
                 YamlConfiguration defConfig = getDefaultConfig();
                 getLogger().warning(String.format("CONFIGURATION ERRORS DETECTED (Severity %d/4):", maxSeverity));
-                
+
                 for (FoolProof.ConfigError err : result.errors()) {
                     if (err.severity() == 3 && err.path() != null && defConfig != null && defConfig.contains(err.path())) {
                         getConfig().set(err.path(), defConfig.get(err.path()));
@@ -73,8 +74,7 @@ public class apve extends JavaPlugin implements Listener {
                     }
                 }
                 getLogger().warning("Plugin will continue working, but proper plugin operation is not guaranteed. The plugin may use default values for safety. Use at your own risk!");
-            } 
-            else {
+            } else {
                 getLogger().severe(String.format("CRITICAL CONFIGURATION ERRORS DETECTED (Severity %d/4)!", maxSeverity));
                 for (FoolProof.ConfigError err : result.errors()) {
                     if (err.severity() >= 4) {
@@ -84,7 +84,6 @@ public class apve extends JavaPlugin implements Listener {
                     }
                 }
                 getLogger().severe("Plugin disabled due to critical configuration errors.");
-
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
@@ -110,7 +109,7 @@ public class apve extends JavaPlugin implements Listener {
             getLogger().warning("A.P.V.E Started with enabled audit-mode, actions to the violators will not apply.");
         }
     }
-    
+
     public NotificationManager getNotificationManager() {
         return notificationManager;
     }
@@ -125,7 +124,9 @@ public class apve extends JavaPlugin implements Listener {
 
     public void performReload(CommandSender sender) {
         reloadConfig();
-        checkConfigForDefault();
+
+        LocalizationManager localizationManager = new LocalizationManager(this);
+        localizationManager.applyLocalization();
 
         YamlConfiguration yamlConfig = (YamlConfiguration) getConfig();
 
@@ -156,7 +157,7 @@ public class apve extends JavaPlugin implements Listener {
             } else {
                 YamlConfiguration defConfig = getDefaultConfig();
                 getLogger().warning(String.format("Configuration errors found on reload (Severity %d/4). The plugin may use default values for safety. Use at your own risk!", maxSeverity));
-                
+
                 for (FoolProof.ConfigError err : result.errors()) {
                     if (err.severity() == 3 && err.path() != null && defConfig != null && defConfig.contains(err.path())) {
                         getConfig().set(err.path(), defConfig.get(err.path()));
@@ -174,10 +175,14 @@ public class apve extends JavaPlugin implements Listener {
             notificationManager.loadMessages();
         }
 
+        if (punishmentManager != null) {
+            punishmentManager.reload();
+        }
+
         sender.sendMessage("[APVE] Config reloaded successfully.");
         getLogger().info("Config reloaded successfully.");
     }
-    
+
     private YamlConfiguration getDefaultConfig() {
         try (InputStream defaultStream = getResource("config.yml")) {
             if (defaultStream != null) {
@@ -189,36 +194,10 @@ public class apve extends JavaPlugin implements Listener {
         return null;
     }
 
-    private void checkConfigForDefault() {
-        File configFile = new File(getDataFolder(), "config.yml");
-        if (!configFile.exists()) return;
-
-        try (InputStream originalStream = getResource("config.yml")) {
-            if (originalStream == null) return;
-
-            String currentContent = Files.readString(configFile.toPath(), StandardCharsets.UTF_8);
-            String originalContent = new String(originalStream.readAllBytes(), StandardCharsets.UTF_8);
-
-            String currentHash = calculateHash(currentContent);
-            String originalHash = calculateHash(originalContent);
-
-            if (currentHash.equals(originalHash)) {
-                getLogger().warning("WARNING: You are using the default unconfigured config.yml!");
-                getLogger().warning("Please configure your config.yml before using A.P.V.E.");
-                getLogger().warning("Without configuring the config.yml, proper plugin operation not guaranteed.");
-            }
-        } catch (Exception e) {
-            getLogger().severe("Could not verify config.yml integrity: " + e.getMessage());
-            getLogger().severe("Proper plugin operation is not guaranteed.");
-        }
-    }
-
     private String calculateHash(String input) throws Exception {
         String normalizedInput = input.replace("\r\n", "\n");
-
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] encodedhash = digest.digest(normalizedInput.getBytes(StandardCharsets.UTF_8));
-
         StringBuilder hexString = new StringBuilder();
         for (byte b : encodedhash) {
             String hex = Integer.toHexString(0xff & b);

@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class FoolProof { 
+public class FoolProof {
 
     private final YamlConfiguration config;
 
@@ -21,6 +21,7 @@ public class FoolProof {
     };
 
     private static final String STRICT_LATIN_PATTERN = "^[a-z]+$";
+    private static final String STRICT_ADVERTISEMENT_WORDS_PATTERN = "^[a-z0-9]+$";
     private static final Pattern DURATION_PATTERN = Pattern.compile("^(\\d+(s|m|h|d|w|mo|y))+$", Pattern.CASE_INSENSITIVE);
     public static final Set<String> PUNISHMENT_TYPE = Set.of("mute", "ban", "banip", "none", "kick");
 
@@ -42,7 +43,10 @@ public class FoolProof {
 
         Map<String, Set<String>> cachedDictionaries = new HashMap<>();
         for (String key : LATINIC_KEYS) {
-            validateDictionary(key, cachedDictionaries, errors);
+            String pattern = key.equals("ad-words")
+                    ? STRICT_ADVERTISEMENT_WORDS_PATTERN
+                    : STRICT_LATIN_PATTERN;
+            validateDictionary(key, pattern, cachedDictionaries, errors);
         }
 
         Set<String> blockedDomains = validateGenericList("blocked-domains", warnings, errors);
@@ -55,7 +59,7 @@ public class FoolProof {
         boolean warnsEnabled = config.getBoolean("warns.warns-is-enabled", false);
         boolean punEnabled = config.getBoolean("punishments.punishments-is-enabled", false);
         boolean auditEnabled = config.getBoolean("audit-mode", false);
-
+        boolean autoDetect = config.getBoolean("punishments.auto-detect-plugin", true);
 
         if (warnsEnabled && !punEnabled) {
             warnings.add("Warns are enabled but punishments are disabled. Proper plugin operation is not guaranteed.");
@@ -82,32 +86,37 @@ public class FoolProof {
             double high = config.getDouble("thresholds.high");
             double medium = config.getDouble("thresholds.medium");
             if (high <= medium) {
-                errors.add(new ConfigError("thresholds.high", String.format("'thresholds.high' (%f) cannot be lower or equal to 'thresholds.medium' (%f).", high, medium), 3));
+                errors.add(new ConfigError("thresholds.high", String.format(
+                        "'thresholds.high' (%f) cannot be lower or equal to 'thresholds.medium' (%f).", high, medium), 3));
             }
         }
     }
 
-    private void validateDictionary(String key, Map<String, Set<String>> cache, List<ConfigError> errors) {
+    private void validateDictionary(String key, String pattern, Map<String, Set<String>> cache, List<ConfigError> errors) {
         if (!config.contains(key)) {
             errors.add(new ConfigError(key, "Missing dictionary list: '" + key + "'", 4));
             return;
         }
-        
+
         List<String> words = config.getStringList(key);
         Set<String> validWords = new HashSet<>();
 
         for (int i = 0; i < words.size(); i++) {
             String word = words.get(i);
-            int line = i + 1; 
+            int line = i + 1;
 
             if (word == null || word.isBlank()) {
-                errors.add(new ConfigError(key, String.format("In dictionary '%s' on line %d there is an illegal input: empty/null value.", key, line), 1));
+                errors.add(new ConfigError(key, String.format(
+                        "In dictionary '%s' on line %d there is an illegal input: empty/null value.", key, line), 1));
                 continue;
             }
 
             String lower = word.toLowerCase(Locale.ROOT);
-            if (!lower.matches(STRICT_LATIN_PATTERN)) {
-                errors.add(new ConfigError(key, String.format("In dictionary '%s' on line %d there is an illegal input: '%s'. (Only latin characters allowed)", key, line, word), 2));
+            if (!lower.matches(pattern)) {
+                errors.add(new ConfigError(key, String.format(
+                        "In dictionary '%s' on line %d there is an illegal input: '%s'. (Only latin characters%s allowed)",
+                        key, line, word,
+                        pattern.equals(STRICT_ADVERTISEMENT_WORDS_PATTERN) ? " and digits" : ""), 2));
             } else {
                 validWords.add(lower);
             }
@@ -129,7 +138,8 @@ public class FoolProof {
         for (int i = 0; i < list.size(); i++) {
             String item = list.get(i);
             if (item == null || item.isBlank()) {
-                errors.add(new ConfigError(path, String.format("In list '%s' at position %d there is an illegal blank/null entry.", path, i + 1), 1));
+                errors.add(new ConfigError(path, String.format(
+                        "In list '%s' at position %d there is an illegal blank/null entry.", path, i + 1), 1));
             } else {
                 set.add(item.toLowerCase(Locale.ROOT));
             }
@@ -165,7 +175,8 @@ public class FoolProof {
 
     private Set<String> validatePunishments(List<ConfigError> errors, List<String> warnings) {
         checkBool("punishments.punishments-is-enabled", errors, 3);
-        
+        checkBool("punishments.auto-detect-plugin", errors, 3);
+
         String[] cmds = {"mute-command", "ban-command", "banip-command", "kick-command"};
         for (String cmd : cmds) {
             String path = "punishments." + cmd;
@@ -181,12 +192,13 @@ public class FoolProof {
         if (rawPerm.isEmpty()) {
             warnings.add("List 'punishments.perm-keywords' is empty.");
         }
-        
+
         Set<String> perms = new HashSet<>();
         for (int i = 0; i < rawPerm.size(); i++) {
             String k = rawPerm.get(i);
             if (k == null || k.isBlank()) {
-                errors.add(new ConfigError("punishments.perm-keywords", String.format("In 'punishments.perm-keywords' at position %d there is a blank value.", i + 1), 1));
+                errors.add(new ConfigError("punishments.perm-keywords", String.format(
+                        "In 'punishments.perm-keywords' at position %d there is a blank value.", i + 1), 1));
             } else {
                 perms.add(k.toLowerCase(Locale.ROOT));
             }
@@ -199,14 +211,15 @@ public class FoolProof {
         checkBool("warns.warn-limit-is-enabled", errors, 3);
         checkBool("warns.warn_reset_when_server_restarts", errors, 3);
         checkBool("warns.temporary-warns", errors, 3);
-        
+
         checkIntMin("warns.warn-limit", 1, errors, 3);
         checkIntMin("warns.warn_reset_count", 1, errors, 2);
-        
+
         checkString("warns.warn-message", errors, 2);
         checkString("warns.last-warn-message", errors, 2);
         checkDuration("warns.warn-reset-time", errors, permKeywords, 3);
     }
+
     private void validateOther(List<ConfigError> errors, Set<String> permKeyWords) {
         checkBool("audit-mode", errors, 3);
         checkBool("console-log", errors, 3);
@@ -225,13 +238,15 @@ public class FoolProof {
         boolean isBlock = config.getBoolean(cat + ".blocking", false);
         boolean isCensor = config.getBoolean(cat + ".censor", false);
         if (isBlock && isCensor) {
-            errors.add(new ConfigError(cat + ".censor", "Category '" + cat + "': 'blocking' and 'censor' cannot both be true simultaneously.", 3));
+            errors.add(new ConfigError(cat + ".censor",
+                    "Category '" + cat + "': 'blocking' and 'censor' cannot both be true simultaneously.", 3));
         }
 
         String typePath = cat + ".type";
         String type = config.getString(typePath, "none").toLowerCase(Locale.ROOT);
         if (!PUNISHMENT_TYPE.contains(type)) {
-            errors.add(new ConfigError(typePath, "Category '" + cat + "': invalid punishment type '" + type + "'. Allowed: " + PUNISHMENT_TYPE, 4));
+            errors.add(new ConfigError(typePath,
+                    "Category '" + cat + "': invalid punishment type '" + type + "'. Allowed: " + PUNISHMENT_TYPE, 4));
         }
 
         if (!type.equals("none")) {
@@ -258,18 +273,21 @@ public class FoolProof {
             "command-msg.perm-fail", "command-msg.help-command-view-req", "command-msg.cfg-reload-msg",
             "command-msg.invalid-syntax", "command-msg.invalid-number", "command-msg.warns.no-warns",
             "command-msg.warns.show", "command-msg.warns.removed", "command-msg.warns.cleared",
-            "command-msg.violation-notify-msg", "command-msg.notify-activate-msg", "command-msg.notify-disabled-msg", "command-msg.player-only"
+            "command-msg.violation-notify-msg", "command-msg.notify-activate-msg",
+            "command-msg.notify-disabled-msg", "command-msg.player-only"
         };
         for (String path : msgPaths) checkString(path, errors, 1);
-        
+
         List<String> helpMsgs = config.getStringList("command-msg.help-command-msg");
         if (helpMsgs.isEmpty()) {
-            errors.add(new ConfigError("command-msg.help-command-msg", "List 'command-msg.help-command-msg' is missing or empty.", 2));
+            errors.add(new ConfigError("command-msg.help-command-msg",
+                    "List 'command-msg.help-command-msg' is missing or empty.", 2));
         } else {
             for (int i = 0; i < helpMsgs.size(); i++) {
                 String msg = helpMsgs.get(i);
                 if (msg == null || msg.isBlank()) {
-                    errors.add(new ConfigError("command-msg.help-command-msg", String.format("In list 'command-msg.help-command-msg' at line %d there is a blank message.", i + 1), 1));
+                    errors.add(new ConfigError("command-msg.help-command-msg", String.format(
+                            "In list 'command-msg.help-command-msg' at line %d there is a blank message.", i + 1), 1));
                 }
             }
         }
@@ -291,7 +309,8 @@ public class FoolProof {
         } else {
             int val = config.getInt(path);
             if (val < min) {
-                errors.add(new ConfigError(path, String.format("Parameter '%s' must be at least %d (got %d).", path, min, val), severity));
+                errors.add(new ConfigError(path, String.format(
+                        "Parameter '%s' must be at least %d (got %d).", path, min, val), severity));
             }
         }
     }
@@ -304,7 +323,8 @@ public class FoolProof {
         } else {
             int val = config.getInt(path);
             if (val < min || val > max) {
-                errors.add(new ConfigError(path, String.format("Parameter '%s' must be between %d and %d (got %d).", path, min, max, val), severity));
+                errors.add(new ConfigError(path, String.format(
+                        "Parameter '%s' must be between %d and %d (got %d).", path, min, max, val), severity));
             }
         }
     }
@@ -320,7 +340,8 @@ public class FoolProof {
         }
         double val = config.getDouble(path);
         if (val <= min || val > max) {
-            errors.add(new ConfigError(path, String.format("Parameter '%s' must be between %f and %f (got %f).", path, min, max, val), 3));
+            errors.add(new ConfigError(path, String.format(
+                    "Parameter '%s' must be between %f and %f (got %f).", path, min, max, val), 3));
             return false;
         }
         return true;
@@ -349,7 +370,9 @@ public class FoolProof {
         }
         String clean = val.trim().replaceAll("^[\"']+|[\"']+$", "").toLowerCase(Locale.ROOT);
         if (!permKeywords.contains(clean) && !DURATION_PATTERN.matcher(clean).matches()) {
-            errors.add(new ConfigError(path, "Invalid duration format in '" + path + "': '" + val + "'. Use valid time formats (e.g., 30m, 8h) or perm-keywords.", severity));
+            errors.add(new ConfigError(path, String.format(
+                    "Invalid duration format in '%s': '%s'. Use valid time formats (e.g., 30m, 8h) or perm-keywords.",
+                    path, val), severity));
         }
     }
 
@@ -371,4 +394,4 @@ public class FoolProof {
             return errors.stream().mapToInt(ConfigError::severity).max().orElse(0);
         }
     }
-} 
+}
