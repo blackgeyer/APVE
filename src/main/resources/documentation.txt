@@ -1,129 +1,144 @@
-TO DO LIST
-WRITE THE WORDS ONLY USING LATINIC ALPHABET
-WRITE THE WORDS WITHOUT ANY SYMBOL LIKE !,. etc.
-WRITE THE WORDS IN LOWERCASE
+================================================================================
+A.P.V.E. DICTIONARY & NORMALIZATION RULES SPECIFICATION
+================================================================================
 
-NORMALIZATOR DOCUMENTATION
+[IMPORTANT INSTRUCTIONS]
+When adding, editing, or validating dictionary words in configuration files:
+1. MANDATORY CONVERT: All dictionary entries MUST be converted using the 
+   exact pipeline described below (latin letters only, lower-case, no symbols).
+2. NO SPACES & NO PUNCTUATION: Strip all spaces, punctuation, and symbols.
+3. SINGLE DIRECTIVE: Use ONLY lowercase Latin characters [a-z].
+
+--------------------------------------------------------------------------------
+1. DICTIONARY INPUT REQUIREMENTS 
+--------------------------------------------------------------------------------
+Before inserting a forbidden word into the configuration dictionary, apply
+these transformation rules manually or logically:
+- Alphabet: ONLY Latin characters (a-z).
+- Case: MUST be entirely lowercase.
+- Symbols & Punctuation: REMOVE ALL symbols (!, ., ,, @, #, $, %, etc.).
+- Duplicates: Collapse repeating letters (e.g., "haaaate" -> "hate").
+
+--------------------------------------------------------------------------------
+2. INTERNAL NORMALIZATION PIPELINE (HOW TEXT IS PROCESSED)
+--------------------------------------------------------------------------------
+The plugin processes raw player chat messages through a strict order of steps:
+
+Step 1: Minecraft Color Code Removal
+  - Strips legacy codes (&a, §c) and hex colors (&#RRGGBB).
+
+Step 2: Invisible Character & Unicode Cleanup
+  - Removes zero-width spaces, joiners, soft hyphens, and control characters.
+  - Applies NFKC Unicode normalization.
+
+Step 3: Case Normalization & Accent Removal
+  - Converts input string to lower case (Locale.ROOT).
+  - Removes combining diacritics and accent marks.
+
+Step 4: Transliteration & Leet-Speak Conversion
+  - Cyrillic to Latin:
+      а->a, б->b, в->v, г->g, д->d, е->e, ё->e, ж->zh, з->z, и->i, й->y,
+      к->k, л->l, м->m, н->n, о->o, п->p, р->r, с->s, т->t, у->u, ф->f,
+      х->h, ц->c, ч->ch, ш->sh, щ->sch, ъ->(empty), ы->y, ь->b, э->e,
+      ю->yu, я->ya
+  - Greek & Special Homoglyphs:
+      α->a, β->b, γ->g, δ->d, ε->e, η->n, θ->th, ι->i, κ->k, λ->l, μ->m,
+      ν->v, ο->o, π->p, ρ->r, σ->s, τ->t, υ->u, χ->x, ψ->ps, ω->w,
+      ø->o, ð->d, þ->th, æ->ae, œ->oe, ŋ->n, ß->s, ł->l, đ->d, ħ->h, ĸ->k, ı->i
+  - Leet-Speak / Digits to Letters:
+      0->o, 1->i, 3->z, 4->ch, 5->s, 6->b, 8->b
+  - Leet-Speak / Symbols to Letters:
+      @->a, $->s, !->i, |->i, +->t, €->e, £->l, ¥->y, §->(empty)
+
+Step 5: Symbol Deletion
+  - The following symbols are completely stripped:
+      * _ - . , / \ ~ ` ' " = ^ # & ( ) [ ] { }
+
+Step 6: Non-Latin Filtering & Duplicate Collapsing
+  - Any character outside [a-z] and whitespace is purged.
+  - Consecutive duplicate characters are collapsed to single occurrences.
+
+--------------------------------------------------------------------------------
+3. EXAMPLES FOR CONFIGURATION WORDS
+--------------------------------------------------------------------------------
+Raw Word/Phrase        ->  Normalized Config Entry
+---------------------------------------------------
+"Прuв€т!"             ->  "privet"
+"f0rb1dd3n"           ->  "forbiddzn"
+"s.p.a.m"             ->  "spam"
+"Чëрный"              ->  "chernyy"
+================================================================================
 
 
 
-    private static final String[] TRANSLIT = new String[65536];
+================================================================================
+A.P.V.E. СПЕЦИФИКАЦИЯ СЛОВАРА И ПРАВИЛ НОРМАЛИЗАЦИИ
+================================================================================
 
-  SYMBOLS PATTERNING
+[ВАЖНЫЕ ИНСТРУКЦИИ]
+При добавлении, редактировании или проверке слов словаря в конфигурационных файлах:
+1. ОБЯЗАТЕЛЬНОЕ ПРЕОБРАЗОВАНИЕ: Все записи словаря ДОЛЖНЫ быть преобразованы с 
+   использованием точного конвейера, описанного ниже (только латинские буквы, 
+   нижний регистр, без символов).
+2. БЕЗ ПРОБЕЛОВ И ЗНАКОВ ПРЕПИНАНИЯ: Удаляйте все пробелы, знаки препинания и символы.
+3. ЕДИНАЯ ДИРЕКТИВА: Используйте ТОЛЬКО строчные латинские символы [a-z].
 
-    MINECRAFT COLOR-SYMBOL PATTERN (Like &,§ etc.)
-    private static final Pattern MINECRAFT_COLOR_PATTERN = Pattern.compile("(?i)[&§]([0-9a-fk-or]|#[0-9a-f]{6}|x([&§][0-9a-f]){6})");
+--------------------------------------------------------------------------------
+1. ТРЕБОВАНИЯ К ВВОДУ СЛОВ ДЛЯ СЛОВАРЯ
+--------------------------------------------------------------------------------
+Перед добавлением запрещённого слова в словарь конфигурации примените
+следующие правила трансформации вручную или логически:
+- Алфавит: ТОЛЬКО латинские символы (a-z).
+- Регистр: ДОЛЖЕН быть полностью нижним (строчные буквы).
+- Символы и знаки препинания: УДАЛИТЕ ВСЕ символы (!, ., ,, @, #, $, %, и т. д.).
+- Дубликаты: Схлопывайте повторяющиеся буквы (например, "haaaate" -> "hate").
 
-    INVISIBLE CHARS PATTERN (Some Unicode )
-    private static final Pattern INVISIBLE_CHARS_PATTERN = Pattern.compile("[\\p{Cf}\\p{Cc}\\u200B-\\u200D\\uFEFF\\u00AD]");
+--------------------------------------------------------------------------------
+2. ВНУТРЕННИЙ КОНВЕЙЕР НОРМАЛИЗАЦИИ (КАК ОБРАБАТЫВАЕТСЯ ТЕКСТ)
+--------------------------------------------------------------------------------
+Плагин обрабатывает исходные сообщения игроков из чата через строгий порядок шагов:
 
-    COMBINING MARKS PATTERN (Like ç, ğ etc.)
-    private static final Pattern COMBINING_MARKS_PATTERN = Pattern.compile("\\p{M}");
+Шаг 1: Удаление цветовых кодов Minecraft
+  - Удаляет коды (&a, §c) и HEX-цвета (&#RRGGBB).
 
-    TO LATIN ALPHABET PATTERN
-    private static final Pattern NON_LATIN_PATTERN = Pattern.compile("[^a-z\\s]");
+Шаг 2: Очистка невидимых символов и Unicode
+  - Удаляет пробелы нулевой ширины, соединители, мягкие переносы и управляющие символы.
+  - Применяет нормализацию Unicode NFKC.
 
-  
-    CYRILIC, HOMOGLYPHS AND OTHER CHARACTER CONVERTION TO LATIN ALPHABET 
-        put('а', "a");  put('б', "b");  put('в', "v");  put('г', "g");  put('д', "d");
-        put('е', "e");  put('ё', "e");  put('ж', "zh"); put('з', "z");  put('и', "i");
-        put('й', "y");  put('к', "k");  put('л', "l");  put('м', "m");  put('н', "n");
-        put('о', "o");  put('п', "p");  put('р', "r");  put('с', "s");  put('т', "t");
-        put('у', "u");  put('ф', "f");  put('х', "h");  put('ц', "c");  put('ч', "ch");
-        put('ш', "sh"); put('щ', "sch");put('ъ', "");   put('ы', "y");  put('ь', "b");
-        put('э', "e");  put('ю', "yu"); put('я', "ya");
+Шаг 3: Нормализация регистра и удаление акцентов
+  - Преобразует входную строку в нижний регистр (Locale.ROOT).
+  - Удаляет комбинируемые диакритические знаки и акценты.
 
-        put('α', "a");  put('β', "b");  put('γ', "g");  put('δ', "d");  put('ε', "e");
-        put('η', "n");  put('θ', "th"); put('ι', "i");  put('κ', "k");  put('λ', "l");
-        put('μ', "m");  put('ν', "v");  put('ο', "o");  put('π', "p");  put('ρ', "r");
-        put('σ', "s");  put('τ', "t");  put('υ', "u");  put('χ', "x");  put('ψ', "ps");
-        put('ω', "w");
+Шаг 4: Транслитерация и конвертация Leet-Speak
+  - Кириллица в латиницу:
+      а->a, б->b, в->v, г->g, д->d, е->e, ё->e, ж->zh, з->z, и->i, й->y,
+      к->k, л->l, м->m, н->n, о->o, п->p, р->r, с->s, т->t, у->u, ф->f,
+      х->h, ц->c, ч->ch, ш->sh, щ->sch, ъ->(пусто), ы->y, ь->b, э->e,
+      ю->yu, я->ya
+  - Греческие и специальные омоглифы:
+      α->a, β->b, γ->g, δ->d, ε->e, η->n, θ->th, ι->i, κ->k, λ->l, μ->m,
+      ν->v, ο->o, π->p, ρ->r, σ->s, τ->t, υ->u, χ->x, ψ->ps, ω->w,
+      ø->o, ð->d, þ->th, æ->ae, œ->oe, ŋ->n, ß->s, ł->l, đ->d, ħ->h, ĸ->k, ı->i
+  - Leet-Speak / Цифры в буквы:
+      0->o, 1->i, 3->z, 4->ch, 5->s, 6->b, 8->b
+  - Leet-Speak / Символы в буквы:
+      @->a, $->s, !->i, |->i, +->t, €->e, £->l, ¥->y, §->(пусто)
 
-        put('ø', "o");  put('ð', "d");  put('þ', "th"); put('æ', "ae"); put('œ', "oe");
-        put('ŋ', "n");  put('ß', "s");  put('ł', "l");  put('đ', "d");  put('ħ', "h");
-        put('ĸ', "k");  put('ı', "i");
+Шаг 5: Удаление символов
+  - Следующие символы полностью удаляются:
+      * _ - . , / \ ~ ` ' " = ^ # & ( ) [ ] { }
 
-    LEET SPEAK CONVERTION TO NORMAL
+Шаг 6: Фильтрация нелатинских символов и схлопывание дубликатов
+  - Любой символ за пределами [a-z] и пробелов удаляется.
+  - Повторяющиеся подряд символы схлопываются до одиночных вхождений.
 
-        put('0', "o");  put('1', "i");  put('3', "z");  put('4', "ch");
-        put('5', "s");  put('6', "b");  put('8', "b");
-
-        put('@', "a");  put('$', "s");  put('!', "i");  put('|', "i");  put('+', "t");
-        put('€', "e");  put('£', "l");  put('¥', "y");  put('§', "");
-
-    SPECIFIC SYMBOLS DELETING
-
-        put('*', "");   put('_', "");   put('-', "");   put('.', "");   put(',', "");
-        put('/', "");   put('\\', "");  put('~', "");   put('`', "");   put('\'', "");
-        put('"', "");   put('=', "");   put('^', "");   put('#', "");   put('&', "");
-        put('(', "");   put(')', "");   put('[', "");   put(']', "");   put('{', "");   put('}', "");
-   
-
-    private static void put(char ch, String replacement) {
-        TRANSLIT[ch] = replacement;
-    }
-
-    FROM-NULL PROTECTION
-
-    public static String normalize(String input) {
-        if (input == null || input.trim().isEmpty()) return "";
-
-     REPLACERS AND CONVERTERS
-
-     	MINECRAFT COLOR SYMBOLS REMOVER
-        String str = MINECRAFT_COLOR_PATTERN.matcher(input).replaceAll("");
-
-        INVISIBLE UNICODE CHARS REMOVER
-        str = INVISIBLE_CHARS_PATTERN.matcher(str).replaceAll("");
-
-        UNICODE HERESY REMOVER 
-        str = Normalizer.normalize(str, Normalizer.Form.NFKC);
-
-        TO LOWER CASE CONVETER (For configuration and plugin optimization)
-        str = str.toLowerCase(Locale.ROOT);
-
-        COMBINING MARKS REMOVER
-        str = COMBINING_MARKS_PATTERN.matcher(str).replaceAll("");
-
-        StringBuilder builder = new StringBuilder(str.length());
-        for (int i = 0; i < str.length(); ) {
-            int codePoint = str.codePointAt(i);
-            if (codePoint < 65536 && TRANSLIT[codePoint] != null) {
-                builder.append(TRANSLIT[codePoint]);
-            } else {
-                builder.appendCodePoint(codePoint);
-            }
-            i += Character.charCount(codePoint);
-        }
-        str = builder.toString();
-
-        str = NON_LATIN_PATTERN.matcher(str).replaceAll("");
-        str = collapseDuplicates(str);
-
-        return str.trim();
-    }
-
-    private static String collapseDuplicates(String text) {
-        if (text == null || text.isEmpty()) return "";
-
-        StringBuilder result = new StringBuilder(text.length());
-        int lastCodePoint = -1;
-        int count = 0;
-
-        for (int i = 0; i < text.length(); ) {
-            int cp = text.codePointAt(i);
-            if (cp == lastCodePoint) {
-                count++;
-                if (count <= 1) { 
-                    result.appendCodePoint(cp);
-                }
-            } else {
-                lastCodePoint = cp;
-                count = 1;
-                result.appendCodePoint(cp);
-            }
-            i += Character.charCount(cp);
-        }
-        return result.toString();
-    }
-}
+--------------------------------------------------------------------------------
+3. ПРИМЕРЫ СЛОВ ДЛЯ КОНФИГУРАЦИИ
+--------------------------------------------------------------------------------
+Исходное слово/фраза   ->  Нормализованная запись в конфиге
+---------------------------------------------------
+"Прuв€т!"             ->  "privet"
+"f0rb1dd3n"           ->  "forbiddzn"
+"s.p.a.m"             ->  "spam"
+"Чëрный"              ->  "chernyy"
+================================================================================

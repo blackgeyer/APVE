@@ -1,10 +1,8 @@
 name: APVE
-version: 1.3.1
+version: 1.3.5
 main: org.apve.apve
 api-version: '1.20.5'
 authors: [blackgeyer/blackgeier]
-depend:
-  - packetevents
 
 commands:
   apve:
@@ -13,6 +11,10 @@ commands:
     permission: apve.use
 
 permissions:
+  apve.use:
+    description: Allows to use /apve command
+    default: op
+    
   apve.reload:
     description: Allows to use /apve reload command
     default: op
@@ -44,11 +46,11 @@ permissions:
    
   apve.violation.notify:
     description: Allows view notifies about player's violations in the game chat. (DYNAMIC)
-    default: op
+    default: false
 
   apve.insult.immune:
     description: APVE will not apply any action to player with this permission if they insult someone.
-    default: op
+    default: false
 
   apve.fam.insult.immune:
     description: APVE will not apply any action to player with this permission if they insult someone's family.
@@ -68,11 +70,11 @@ permissions:
 
   apve.social.immune:
     description: APVE will not apply any action to player with this permission if they distribute the social medias.
-    default: op
+    default: false
 
   apve.advertisement.immune:
     description: APVE will not apply any action to player with this permission if they distribute other resources.
-    default: op
+    default: false
 
   apve.staff.insult.immune:
     description: APVE will not apply any action to player with this permission if they insult staff.

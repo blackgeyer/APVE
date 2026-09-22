@@ -1,0 +1,91 @@
+warns:
+  warn-message: |
+    <red>Your message did not pass the compliance check.
+    <red>Please do not violate the chat rules.
+  last-warn-message: |
+    <red>You have been warned for violating chat rules.
+    <red>Repeated violations will lead to sanctions.
+
+insult:
+  reason: "Insult."
+  blocking-reason: "<red>Your message was blocked: Insult."
+  censor-reason: "<red>Your message was censored: Insult."
+
+family-insult:
+  reason: "Family insult."
+  blocking-reason: "<red>Your message was blocked: Family insult."
+  censor-reason: "<red>Your message was censored: Family insult."
+
+ad-dist:
+  reason: "Advertising."
+  blocking-reason: "<red>Your message was blocked: Advertising."
+  censor-reason: "<red>Your message was censored: Advertising."
+
+soc-media-dist:
+  reason: "Social media advertising."
+  blocking-reason: "<red>Your message was blocked: Social media advertising."
+  censor-reason: "<red>Your message was censored: Social media advertising."
+
+adult-content:
+  reason: "Adult content reference."
+  blocking-reason: "<red>Your message was blocked: Adult content."
+  censor-reason: "<red>Your message was censored: Adult content."
+
+staff-insult:
+  reason: "<Staff insult."
+  blocking-reason: "<red>Your message was blocked: Staff insult."
+  censor-reason: "<red>Your message was censored: Staff insult."
+      
+spam:
+  reason: "Spam."
+  blocking-reason: "<red>Your message was blocked: Spam."
+
+caps:
+  reason: "Excessive caps usage."
+  blocking-reason: "<red>Your message was blocked: Excessive caps usage."
+  censor-reason: "<red>Your message was censored: Excessive caps usage."
+
+command-msg:
+  perm-fail: "<red>Access denied."
+  help-command-view-req: "<red>Unknown command. Type /apve help to see available commands."
+  help-command-msg: 
+    - "<green>Available commands:"
+    - "<dark_green>/apve reload — Reload APVE's configuration"
+    - "<dark_green>/apve warns show <nickname> — View the player's warns history"
+    - "<dark_green>/apve warns remove <nickname> <integer> — Remove player's warns. The amount of removed warns equals the <integer> argument."
+    - "<dark_green>/apve warns clear <nickname> — Clear all of the player's warns."
+    - "<dark_green>/apve notify toggle — Toggle notifications about player violations."
+    - "<dark_green>/apve check <text> — Checks the 'text' argument to the rule violations."
+
+  cfg-reload-msg: "<dark_blue>Reloading configuration..."
+  invalid-syntax: "<red>Invalid syntax. Usage: {usage}"
+  invalid-number: "<red>Argument '{arg}' must be a valid number."
+
+  violation-notify-msg: "<red>NOTIFY: Player <yellow>{player} <red>sent a message <white>{message} <red>which violates <dark_red>{type} <red>due to similarity/equality to <yellow>{word}."
+  notify-activate-msg: "<green>Successfully <dark_green>enabled <green>notifications about player violations."
+  notify-disabled-msg: "<green>Successfully <dark_red>disabled <green>notifications about player violations."
+  player-only: "<red>Only a player can execute this command."
+  
+  warns:
+    no-warns: "<yellow>Player {player} currently has no active warns."
+    show: "<green>Player <yellow>{player} <green>has <red>{amount} <green>active warns. Highest violation rule: <red>{violation}<green>."
+    removed: "<green>Successfully removed <yellow>{amount} <green>warns from <yellow>{player}<green>. Remaining warns: <yellow>{left}<green>."
+    cleared: "<green>All warns successfully cleared for <yellow>{player}<green>."
+
+  check:
+    header: "<dark_gray>[<aqua>A.P.V.E Word Checker<dark_gray>]"
+    raw: "<gray>Input text: <white>{raw}"
+    normalized: "<gray>Normalized text: {normalized}"
+    status: "<gray>Check status: {status_color}{status}"
+    matched-word: "<gray>Found word: <yellow>{word}"
+    dict-word: "<gray>Dictionary sample: <gold>{dict}"
+    detail: "<gray>Check details: <aqua>{detail}"
+
+  check-in-cmd:
+    header: "A.P.V.E Word Checker"
+    raw: "Input text: {raw}"
+    normalized: "<Normalized text: {normalized}"
+    status: "Check status: {status}"
+    matched-word: "Found word: {word}"
+    dict-word: "Dictionary sample: {dict}"
+    detail: "Check details: {detail}"

@@ -5,475 +5,1781 @@
 # Normalizer converts any cyrilic symbols into latin alphabet. Consequently, the addition of new banned words must be fully in latin alphabet like (шлюха --> shlyuha).
 # Full normalization documentation you can see in documentation.txt
 
+# Language of localization. Available: ru, us and auto. If auto, plugin will be automatically set localization according to your system language.
+# Localizations are fully customizable.
+language: auto
+
 thresholds:
-  high: 0.78  
-  medium: 0.57  
+  high: 0.78
+  medium: 0.57
 
 # 1. Insult words
 insult-words:
-  # Russian (Translit)
-  - "eblan"
-  - "eblanische"
-  - "eblanka"
-  - "dolboeb"
-  - "dolboyob"
-  - "dolboebina"
-  - "dolboyascher"
-  - "ebanat"
-  - "ebanashka"
-  - "ebanatik"
-  - "hueplet"
-  - "huesos"
-  - "huesosi"
-  - "hueglot"
-  - "hueputalo"
-  - "huenosec"
-  - "huevat"
-  - "huedrysch"
-  - "pizdabol"
-  - "pizdabolka"
-  - "pizdaliz"
-  - "blyad"
-  - "blyat"
-  - "blyadb"
-  - "blyatb"
-  - "blyadina"
-  - "blyadskiy"
-  - "blyadstvo"
-  - "blyadun"
-  - "blyadota"
-  - "gandon"
-  - "ochkoshnik"
-  - "gandonische"
-  - "mudak"
-  - "mudila"
-  - "pidor"
-  - "pidoras"
-  - "pidrenok"
-  - "pidrila"
-  - "pidrische"
-  - "pidorazina"
-  - "mrazb"
-  - "ueban"
-  - "ebenb"
-  - "mrazota"
-  - "otrodbe"
-  - "manda"
-  - "vyblyadok"
-  - "shlyuha"       
-  - "shlyushka"   
-  - "shalava"       
-  - "shmara"        
-  - "potaskuha"     
-  - "potaskushka"  
-  - "davalka"      
-  - "podstilka"    
-  - "prostitutka"     
-  - "suchka"       
-  - "tvarb"       
-  - "paskuda"
-  - "sirota"
-  - "bezmamysh"
-  - "vyblyadok" 
-  - "ebut"
-  - "ebatb"
-  - "ebat"
-  - "ebal"
-  - "ebala"
-  - "ebem"
-  - "ebaniy"
-  - "ebuchiy"
-  - "zaebal"
-  - "naebal"
-  - "doebalsya"
-  - "poebat"
-  - "trahaem"
-  - "trahnuli"
-  - "trahnul"
-  - "trahatsa"
-  - "trahal"
-  - "trahala"
-  - "trakhat"
-  - "vyebali"
-  - "vyebal"
-  # English
-  - "fuck"
-  - "shit"
-  - "dick"
-  - "cunt"
-  - "hoe"
-  - "fag"
-  - "pussy"
-  - "bastard"
-  - "bitch"
-  - "asshole"
-  - "dickhead"
-  - "retard"
-  - "loser"
-  - "dumbass"
-  - "idiot"
-  - "wanker"
-  - "twat"
-  - "dipshit"
-  - "moron"
-  - "prick"
-  - "imbecile"
-  - "scumbag"
-  - "douchebag"
+- eblan
+- eblanische
+- eblanka
+- dolboeb
+- dolboyob
+- dolboebina
+- dolboyascher
+- ebanat
+- ebanashka
+- ebanatik
+- hueplet
+- huesos
+- huesosi
+- hueglot
+- hueputalo
+- huenosec
+- huevat
+- huedrysch
+- pizdabol
+- pizdabolka
+- pizdaliz
+- blyad
+- blyadb
+- blyadina
+- blyadskiy
+- blyadstvo
+- blyadun
+- blyadota
+- gandon
+- ochkoshnik
+- gandonische
+- mudak
+- mudila
+- pidor
+- pidoras
+- pidrenok
+- pidrila
+- pidrische
+- pidorazina
+- mrazb
+- ueban
+- ebenb
+- mrazota
+- otrodbe
+- manda
+- vyblyadok
+- shlyuha
+- shlyushka
+- shalava
+- shmara
+- potaskuha
+- potaskushka
+- davalka
+- podstilka
+- prostitutka
+- suchka
+- tvarb
+- paskuda
+- sirota
+- bezmamysh
+- vyblyadok
+- ebut
+- ebatb
+- ebat
+- ebal
+- ebala
+- ebem
+- ebaniy
+- ebuchiy
+- zaebal
+- naebal
+- doebalsya
+- poebat
+- trahaem
+- trahnuli
+- trahnul
+- trahatsa
+- trahal
+- trahala
+- trakhat
+- vyebali
+- vyebal
+- fuck
+- dick
+- cunt
+- hoe
+- fag
+- bastard
+- bitch
+- asshole
+- dickhead
+- retard
+- dumbass
+- idiot
+- wanker
+- twat
+- dipshit
+- moron
+- prick
+- imbecile
+- scumbag
+- douchebag
 
-# 1.1. Family insult words
+# 1.1. Family pronouns 
 family-insult-words:
-  # Russian (Translit)
-  - "mam"
-  - "pap"
-  - "bat"
-  - "otc"
-  - "mamu"
-  - "mame"
-  - "mamul"
-  - "matb"
-  - "macheha"
-  - "otca"
-  - "batya"
-  - "bate"
-  - "opekun"
-  - "opeka"
-  - "rodnyu"
-  - "roditeley"
-  - "roditelyam"
-  - "mamka"       
-  - "mamasha"     
-  - "mamochka"     
-  - "matushka"     
-  - "mamulya"      
-  - "maman"   
-  - "mama" 
-  - "mamy"       
-  - "papa"     
-  - "papu"      
-  - "pape"      
-  - "otets"    
-  - "otcu"    
-  - "otcom"    
-  - "babushka"    
-  - "dedushka"
-  - "doch"       
-  - "dochka"   
-  - "dochenka"   
-  - "sestra"      
-  - "sestru"    
-  - "brata"       
-  # English
-  - "motherfucker"
-  - "milf"
-  - "mother"
-  - "mom"
-  - "mum"
-  - "father"
-  - "dad"
-  - "parents"
-  - "orphan"
+- mam
+- pap
+- bat
+- otc
+- mamu
+- mame
+- mamul
+- matb
+- macheha
+- otca
+- batya
+- bate
+- opekun
+- opeka
+- rodnyu
+- roditeley
+- roditelyam
+- mamka
+- mamasha
+- mamochka
+- matushka
+- mamulya
+- maman
+- mama
+- mamy
+- papa
+- papu
+- pape
+- otets
+- otcu
+- otcom
+- babushka
+- dedushka
+- doch
+- dochka
+- dochenka
+- sestra
+- sestru
+- brata
+- brat
+- papasha
+- motherfucker
+- milf
+- mother
+- mom
+- mum
+- father
+- dad
+- parents
 
 family-roots:
-  - "roditel"  
-  - "opek"      
-  - "mother"
-  - "father"
+- roditel
+- opek
+- mother
+- father
+- brat
+- doch
+- mamash
+- papash
 
 bad-roots:
-  # Russian (Translit)
-  - "eblan"
-  - "dolboeb"
-  - "huesos"
-  - "gandon"
-  - "mudak"
-  - "pidr"
-  - "pidoras"
-  - "mraz"
-  - "ueban"
-  - "vyblyad"
-  - "shlyuh"        
-  - "shalav"       
-  - "prostitut"     
-  - "potaskuh"  
-  # English
-  - "bastard"
-  - "whore"
-  - "slut"
-  - "faggot"
+- eblan
+- dolboeb
+- huesos
+- gandon
+- mudak
+- pidr
+- pidoras
+- mraz
+- ueban
+- vyblyad
+- shlyuh
+- shalav
+- prostitut
+- potaskuh
+- bastard
+- whore
+- slut
+- faggot
 
 expressive-words:
-  # Russian (Translit)
-  - "pizda"
-  - "pizdec"
-  - "blyadb"
-  - "nahuy"
-  - "pohuy"
-  # English
-  - "fuck"
-  - "fucking"
-  - "shit"
-  - "crap"
-  - "damn"
+- pizda
+- pizdec
+- blyatb
+- nahuy
+- pohuy
+- shit
+- crap
+- damn
 
-# 4. Ads and links
+# 4. Ads and links 
 ad-words:
-  - "funpay"
-  - "playerok"
-  - "aternos"
-  - "minehut"
-  - "reallyworld"
-  - "dexland"
-  - "funtime" 
-  - "holyworld"
-  - "funmine"
-  - "teslacraft"
-  - "vinemc" 
-  - "bixland"
-  - "mixland"  
-  - "spookytime"
-  - "ragemine"                          
+- 10b10t
+- 123c
+- 1f2d
+- 1mine
+- 1moreblock
+- 20tps
+- 2b2e
+- 2b2t
+- 2b2tnohack
+- 2b2u
+- 2k2f
+- 2p2t
+- 3smp
+- 42web
+- 4mine
+- 5block
+- 7b7t
+- 8b8t
+- abyssalhaven
+- acentramc
+- acornmc
+- acucreate
+- addstarmc
+- advmine
+- aequitassmp
+- aetherblock
+- aetheriacobblemon
+- aethervalesmp
+- aferamine
+- aezamine
+- aklandcraft
+- akvarium228
+- aletra
+- allouttablocks
+- alluminus
+- alohamc
+- alloyworlds
+- altcraft
+- altermc
+- altirk
+- alulomcraft
+- amazehut
+- ambitioncraft
+- amiciingame
+- amiverse
+- amokleaf
+- ampznetwork
+- ancimoon
+- ancientgg
+- andertime
+- andromedaworld
+- angelgrief
+- anicloud
+- anihot
+- antichita
+- antisocial4fun
+- antralia
+- apexcobblemon
+- apexmc
+- apextime
+- apocgaming
+- apollonetwork
+- apollyonmc
+- applecraft
+- applecube
+- aranarth
+- arcadiamc
+- arcanerealms
+- arcanic
+- arcanix
+- armlix
+- artminepe
+- ascensioncraft
+- ascensionmc
+- asketmc
+- asketplay
+- ashenmc
+- asianet
+- aspiriamc
+- astirix
+- astralwix
+- astrocraft
+- astrums
+- asylumsmp
+- atommc
+- auburnsmp
+- auraland
+- aurabuilds
+- aureusmc
+- aurorix
+- avaloncraft
+- avatarmc
+- avatarus
+- avatarverse
+- aviakvas
+- avosmp
+- awrld
+- axismine
+- axisland
+- axonmc
+- aztecraft
+- aztecmc
+- back2basics
+- baconetworks
+- badwolfmc
+- bagelsmp
+- balkaniacraft
+- bamboomine
+- bamboosmp
+- bananasmp
+- bartolsmp
+- bashybashy
+- battlemine
+- beacoland
+- bearcraft
+- bebramaximum
+- beemanity
+- beemine
+- beeworlds
+- benwyw
+- berrycraft
+- bestsmp
+- beuteugeu
+- beyondclouds
+- bgnmc
+- bhsmp
+- bigcraft
+- bixland
+- blackarchive
+- blacktime
+- blmodern
+- blazebr
+- blockparty
+- blockstorm
+- blockemon
+- blockheadodyssey
+- blockparty
+- blockrealms
+- blocksMC
+- blockstadt
+- bloodmc
+- bloomworld
+- bmcpe
+- boholmc
+- bombasmp
+- bomjpvp
+- boopnet
+- borealis
+- bosscraft
+- bosssmp
+- bosygrief
+- brainrotsmc
+- breadix
+- breadixpe
+- breezemine
+- breezesmp
+- breiwalkersmp
+- brexcraft
+- bricklyworld
+- brmine
+- bucketry
+- bugmc
+- buildtheearth
+- bullmc
+- bunnytime
+- burmalda
+- cakesmp
+- callistomc
+- candymine
+- carvexmc
+- casualminecraft
+- cavetale
+- ccnetmc
+- celestiallight
+- centurymine
+- chstr
+- cheatmine
+- cheerycherry
+- cherryblock
+- chillproject
+- chilltown
+- chronoworld
+- cirnovarenie
+- civnodes
+- clacyworld
+- clovergame
+- cloudhavenmc
+- cloudyworlds
+- cloudworld
+- coastsmp
+- coastcraft
+- cobbleasia
+- cobblecove
+- cobblegenerations
+- cobblekingdoms
+- cobbleland
+- cobblemondelta
+- cobblemonconquest
+- cobblemonorigins
+- cobblemonascendant
+- cobblemonau
+- cobblemongenesis
+- cobblemonrivals
+- cobbleuniverse
+- cobbleworld
+- cobramc
+- coinmc
+- comiccraft
+- commencesmp
+- cominers
+- conedmc
+- conquerearthmc
+- consolemc
+- cookietime
+- cookiesmp
+- coronaworld
+- cosmicsmp
+- cosmicreborn
+- cosmicx
+- couchcraft
+- countrymc
+- cozycrafters
+- cozyorigins
+- cozysmp
+- crabbymc
+- craftdan
+- craftershq
+- crafterrium
+- craftersland
+- craftersuniverse
+- craftnbuild
+- craftportmc
+- craftedsurvival
+- creativecentral
+- creativefun
+- creeperslab
+- crescentkingdom
+- crimsoncoalition
+- cropsmc
+- crowntime
+- crownwar
+- crypticmc
+- crystalcube
+- crystalium
+- crystalskies
+- cubach
+- cubecadia
+- cubeincube
+- cubedmc
+- cubelife
+- cubenet
+- cubenex
+- cubesworld
+- cubeville
+- cubexworld
+- cubixs
+- cubixworld
+- cubometre
+- cubevanilla
+- cubeverse
+- custcraft
+- cybercraftt
+- cybertulpa
+- cynagen
+- darklandss
+- darknessmc
+- dasstuebchen
+- dayzombie
+- deadmine
+- deltamine
+- destix
+- devcreative
+- deworld
+- dexland
+- dextime
+- dexworld
+- diamondworld
+- dinomine
+- diplomaticamc
+- displaycraft
+- diviniuneternal
+- dizgrief
+- dizzenziocraft
+- dmcraft
+- dmsdraft
+- dnsburk
+- dodgesmp
+- donutsmp
+- dragontime
+- dragoncraftsuper
+- dreamfox
+- dreammc
+- dreamwars
+- dreamwood
+- dripmc
+- duckworld
+- duallfun
+- dungeoncraft
+- dungeonrealms
+- dwsmp
+- dygers
+- dynmc
+- dystoria
+- eaglescreative
+- earthmc
+- easygrief
+- eclipsemine
+- ecomc
+- ecosmp
+- edsclassicsmp
+- elementcraft
+- elician
+- eldoria
+- elybox
+- elysi
+- elysiumsmp
+- elytry
+- emberhost
+- empressmc
+- enchantedmc
+- enchantmc
+- enderblade
+- endlesenterprises
+- endsmp
+- energymc
+- enthusia
+- envyworld
+- epicquestz
+- epserv
+- esmcrp
+- estamonhost
+- eternalhc
+- ethelmc
+- etty
+- eudoramc
+- evymc
+- evolvedsurvival
+- excaliburcraft
+- exeoscraft
+- exilemc
+- exodusmc
+- experimentb
+- f3f5
+- fablesmc
+- fablesmp
+- factionwars
+- faeriessmp
+- faewildmc
+- fakepixel
+- familymc
+- farmsteadminecraft
+- fatemine
+- feather64
+- fecraft
+- federalnetwork
+- felonnetwork
+- femrep
+- feplex
+- fernsmp
+- finemine
+- firemc
+- firestartermc
+- fishonmc
+- fjordsmp
+- fjordwars
+- fkas
+- flametime
+- flaremc
+- flexity
+- flickworld
+- flightsmp
+- flime
+- fliten
+- flocraft
+- floryx
+- fluffyrp
+- fluxland
+- forine
+- foxcraftsmp
+- foxmine
+- foxneon
+- foxysmp
+- fragglecraft
+- fracturedrealm
+- freetmine
+- frenkmine
+- freshmine
+- frootlysmp
+- froggysmp
+- frostpe
+- frosthold
+- fruitysmp
+- fruitservers
+- fullmine
+- funblocks
+- funmoon
+- funtag
+- funtime
+- furryland
+- fusionnetwork
+- galimdor
+- galaxymc2025
+- galesmp
+- gamai
+- game24
+- gamerhubmc
+- gamepvp
+- gamster
+- gardensmc
+- gemgrove
+- gementarmc
+- gemmc
+- genscraft
+- genmc
+- genrivals
+- geoforgemc
+- ggland
+- ggmine
+- gg.mineland
+- ghostgrief
+- ghostworld
+- gladmc
+- glorytime
+- goblinsmp
+- godstreaksmp
+- goidacraft
+- goldenelytra
+- goldenleafmc
+- goldmc
+- goldplacemc
+- gomc
+- goodmc
+- gospelcraft
+- gotemc
+- gracecube
+- grandcivitas
+- grandray
+- gravitycraft
+- grayworld
+- greendreamsmp
+- greenmine
+- greenwix
+- greenworld
+- griefland
+- grindblock
+- grumpshollow
+- gshub
+- guccipe
+- gummercraft
+- gunmax
+- gyrax
+- gyrosmp
+- hallowedfantasy
+- hallowprison
+- halsir
+- happymc
+- happysmp
+- happyworld
+- hardcorecraft
+- hardcoresmp
+- hardcube
+- hardmc
+- hardmine
+- hardshard
+- harlonserver
+- harrys
+- havencraftmc
+- haycube
+- hazerot
+- hazeynetwork
+- heartfall
+- heavenlyweiner
+- heavencraft
+- hellominers
+- hexagonmc
+- hibuild
+- hillmine
+- hirayasmp
+- hollowmine
+- hollytime
+- homeycraft
+- horizonsend
+- horizonsmp
+- howlmc
+- hsmg
+- hubsmp
+- hungrybirds
+- hustlersmc
+- hwhub
+- hydramc
+- hypansmp
+- hyperempire
+- hypixel
+- hysteriagaming
+- idlecraft
+- illegalworld
+- imaginitycraft
+- imaginefun
+- impendmc
+- incloudgame
+- infinitybox
+- infinityplay
+- inmine
+- insanitygaming
+- iontect
+- ipixelmon
+- iridus
+- irismc
+- ironmine
+- itsnone
+- izvorum
+- jackpotmc
+- jartex
+- jarton
+- jelecraft
+- jellysmp
+- jerdjenrepublic
+- jewelwood
+- jogarbrasilcraft
+- joinproject
+- jollysmp
+- jonarchy
+- journeygaming
+- jumpreset
+- justanotherhardcore
+- kairvex
+- kenigcraft
+- kestramon
+- kgrbeach
+- kingdomsmc
+- kingsmc
+- klark
+- knockturnmc
+- koalaservers
+- kobbledkarp
+- konisfort
+- konkoda
+- kooplemon
+- krasworld
+- kreatious
+- krisqsmp
+- kryth
+- krypticmc
+- kuboland
+- kupchikcraft
+- kwrb
+- lanternsmp
+- lastmine
+- layag
+- lazycraft
+- leafcraft
+- legacymc
+- legacyduck
+- legendcraft
+- legendaryhc
+- lemonsmp
+- lenscape
+- leynak
+- lgbtempire
+- ligatime
+- lightmight
+- likemc
+- liliessmp
+- limitlessmc
+- lioncraft
+- liptontime
+- listicktime
+- lithiumplay
+- livingstonemc
+- lksmp
+- lockblock
+- lockedupmc
+- logonik
+- lokamc
+- lolia
+- lonelyducksmp
+- lonksmc
+- lordy
+- lostaura
+- lostcube
+- lostvale
+- lotuscove
+- lucksmp
+- luckyfarm
+- luckydayz
+- lumamc
+- lunacymc
+- lunarlabs
+- lunaris
+- lunaverse
+- madmc
+- maestroworld
+- magbungkal
+- magicaleight
+- magicmc
+- magnoliasurvival
+- magnoliamc
+- manacube
+- manawind
+- mangogrief
+- mangosmp
+- maplewoodmc
+- marmeluna
+- masedworld
+- massivecraft
+- mastersmp
+- matchasmp
+- maylan
+- mazeeworld
+- mbars
+- mbhost
+- mccentral
+- mcages
+- mcblaze
+- mcgoodtime
+- mchiddengem
+- mcjoin
+- mckingdom
+- mcl
+- mcliminalworld
+- mcsunrise
+- mcwebcraft
+- mczone
+- mcdaz
+- mcdayz
+- mcfunny
+- mchub
+- mclan
+- mclearn
+- mclemon
+- mll
+- mcmem
+- mcplay
+- mcrt
+- mcskill
+- mcstatecraft
+- mctrain
+- mcuniverse
+- mcvanilla
+- mcwar
+- mdresorts
+- meadowsmp
+- meadmc
+- medrp
+- megacraft
+- megacrafting
+- megstone
+- mellowcraft
+- mellstroyworld
+- melonis
+- meltarion
+- memworld
+- meowcraftsmp
+- merakimc
+- mesamc
+- mesumimc
+- metaunion
+- meteormc
+- mewworld
+- mezeul
+- mgw
+- mhell
+- milleniumnetwork
+- minarchy
+- minearchy
+- mineblaze
+- mineberry
+- minecat
+- mineclash
+- minecores
+- minecove
+- minecoremc
+- minecraftholly
+- minecraftland
+- minecrafttimes
+- minecraftonline
+- minecraftonly
+- minedrip
+- mineeasy
+- mineflux
+- minefresh
+- minehunt
+- minekai
+- mineland
+- minelandy
+- minelife
+- minelord
+- minemagic
+- minemix
+- minemist
+- mineomir
+- mineoptima
+- minepeak
+- minepixel
+- mineplex
+- minerating
+- mineream
+- minerent
+- minerich
+- minescar
+- mineshards
+- minescape
+- mineshort
+- mineslope
+- minestory
+- minetexas
+- minevalt
+- minewind
+- minewish
+- minewonderland
+- minezona
+- mintservers
+- minwix
+- mischiefsmp
+- mistmc
+- mistylands
+- mkbuilders
+- mkdserver
+- mlmc
+- mlegacy
+- mmorealms
+- mmtcraft
+- modkrate
+- modscraft
+- mollymine
+- moneymc
+- monidays
+- moonlandmc
+- mooshysmp
+- mossnmoon
+- mosscraft
+- msdrp
+- msl
+- msrebound
+- mugivaracraft
+- murcha
+- mycube
+- myinstacraft
+- mynexora
+- mystianfields
+- mysticchicken
+- mysticmc
+- mysticnexus
+- mysticrunes
+- mysticvalleycraft
+- mythblock
+- mythicmines
+- mythica
+- mythrend
+- namida
+- narutoadventures
+- nationmc
+- naturalcraft
+- necomc
+- needlife
+- neriumcraft
+- nestcraft
+- networkargentina
+- networkforgamers
+- newlands
+- newwindserver
+- nexavil
+- nexitcube
+- nexus1
+- nexusmine
+- nexusverse
+- nikosmp
+- nimera
+- ninden
+- noblecraft
+- noduscraft
+- nomadhost
+- nonamecraft
+- nonameproject
+- noobline
+- noorlandmc
+- nordfjell
+- nostalgiacraft
+- novaanx
+- novahaven
+- novamc
+- novatonnet
+- novoria
+- novonpvp
+- nuclearhaven
+- oasyspe
+- oblivioncraft
+- oceancraft
+- oceansurvival
+- oddblox
+- oddlyvanilla
+- odmc
+- ogcraft
+- ogskys
+- oldmine
+- olimpworld
+- olivecraft
+- oneruby
+- onehcf
+- onepeace
+- onepe
+- oneverse
+- onelifehardcore
+- onestrike
+- onetick
+- onyxpe
+- opblocks
+- oraclepvp
+- ordinarysmp
+- orebound
+- orbisrealms
+- orzea
+- osservers
+- oscumacraft
+- ostrov77
+- otheryia
+- ottersmp
+- paintgrief
+- pandamium
+- pandaville
+- paperway
+- paradiseland
+- paradisefalls
+- paranoyagrief
+- parkourbeat
+- parkourciv
+- pathisorb
+- patiserver
+- pazikcraft
+- peacefulfarms
+- pengarty
+- persicraft
+- petalcraft
+- phantasymc
+- phoenixpe
+- phvproject
+- pineserver
+- pinland
+- pinisland
+- pinoycraft
+- piratcraft
+- piratemc
+- pixelbeam
+- pixelblockmc
+- pixelmonrealms
+- pixelrus
+- pixelverse
+- pixelcraft
+- planksmp
+- plasmanw
+- playamethyst
+- playfast
+- playturtlecraft
+- playbethebestmc
+- playcdu
+- playerhouse
+- playersworld
+- playgora
+- playlogsmp
+- playmc
+- playmonumenta
+- playnovatek
+- playobscuros
+- playstrix
+- playtide
+- playuhc
+- plexon
+- plexsmp
+- plextoria
+- pluhi
+- pokebalta
+- pokecade
+- pokecentral
+- pokeclash
+- pokefind
+- pokelegends
+- pokelords
+- pokeresort
+- pokesaga
+- pokesmp
+- politempire
+- politmine
+- politpig
+- poppyland
+- potionmc
+- pozorcube
+- powergrief
+- prayme
+- prismacraft
+- prismaearth
+- prismforge
+- prismparty
+- progmine
+- projectcivilization
+- projectazoth
+- projecteden
+- projectmintmc
+- proximamp
+- prostocraft
+- prostotrainer
+- provim
+- publicevo
+- punkcraft
+- purelunacy
+- purevanilla
+- purityvanilla
+- pvpcloud
+- pvplegacy
+- pvpingmc
+- pwcraft
+- qiwioner
+- qmo
+- quackcraft
+- quacklecraft
+- quantumbox
+- qutexsmp
+- qvmine
+- ragemine
+- ragemines
+- ragex
+- ragnarmc
+- raisincloud
+- rasebalo
+- rasiel
+- rasphost
+- ravennetwork
+- razeworld
+- razormc
+- realbeta
+- realmc
+- realmix
+- realmofelysium
+- reallydomer
+- rebirthofbalkan
+- redbanner
+- rederevo
+- redesgp
+- redishsmp
+- redlinemc
+- redvix
+- refinedvanilla
+- reforgednetwork
+- reigncraft
+- rekryt
+- remo
+- reserv
+- revivalmc
+- revitalizemc
+- revivehost
+- rexkraft
+- rhinomc
+- richday
+- richmc
+- riselife
+- rivalssmp
+- robblestone
+- robomine
+- roliksland
+- romixerx
+- rootboundrpg
+- roxyland
+- royalcraft
+- royalemc
+- royalpub
+- royaltysmp
+- rulercraft
+- runbad
+- runecraft
+- ruscrafting
+- rusticmc
+- rvnl
+- rxxserver
+- safesurvival
+- sakeva
+- sancraft
+- sanan
+- sanpe
+- samosbormc
+- saturnx
+- scmain
+- scraftsmp
+- schalker
+- seiky
+- semianarchymc
+- sentinelcraft
+- serbcraft
+- serenesmp
+- servakpola
+- serverlandofstory
+- serverchichi
+- servervanilla
+- servop
+- sharkmc
+- sharksmp
+- sheeshcraft
+- shinyvalesmp
+- shizcraft
+- siderealms
+- siegelands
+- silvermons
+- silverpeek
+- simpleminecraft
+- simplesurvival
+- simplezone
+- simplyhardcore
+- simplyvanilla
+- simpvp
+- sincerecraft
+- sinexwix
+- siriusmc
+- siteb
+- sklyare
+- sknewimc
+- skybars
+- skyclubmc
+- skyfastland
+- skylinex
+- skyloftmc
+- skymine
+- skyprison
+- skyrune
+- skytime
+- slaymine
+- slendernight
+- smakshine
+- smashmc
+- smithtainment
+- smpearth
+- smmpvp
+- snailcraftmc
+- snowgrief
+- snuggerymine
+- snugsmp
+- sodamc
+- solacesmp
+- solacecraft
+- solarciv
+- solidhost
+- soloanarchy
+- soloramc
+- soloshin
+- sonmon
+- sosal
+- soskovcraft
+- soulrealms
+- sourcerealms
+- sovereignmc
+- sparkcraft
+- sparksmp
+- sparktime
+- spikeserver
+- spilserver
+- spiritwave
+- splindux
+- spongesmp
+- spongecraft
+- spooderlex
+- sporemc
+- spotymc
+- squareface
+- squareheads
+- squareland
+- squigcraft
+- srein
+- srvwatercraft
+- stampedemc
+- starcraftmc
+- staticstudios
+- steadfastsmp
+- stellarealm
+- stoneworks
+- stormtime
+- storysmp
+- strictlyvanilla
+- strmine
+- strongcraft
+- subwix
+- subzeromc
+- sulfurcube
+- summer2014
+- summitsurvival
+- summitmc
+- sunrisemc
+- sunrealms
+- sunsmp
+- sunwix
+- sunnyworld
+- superfuntime
+- superpvpmc
+- survivify
+- survivalandia
+- survivorsmp
+- surwave
+- swancraftmc
+- sweettime
+- symbionex
+- synapsepe
+- talescraft
+- talonmc
+- talltalesrp
+- tartariamc
+- tavernmc
+- tavix
+- tbblock
+- techkio
+- teia
+- teldaria
+- telluris
+- templeroad
+- tenomiareborn
+- terradivisa
+- teraland
+- terranovasmp
+- terratrove
+- theapex
+- thecavern
+- thecoilmc
+- thegardenmc
+- thegregsmp
+- thelabmc
+- thelastblockbender
+- theloftmc
+- theoldfrontiermcrp
+- thepenmc
+- thesonya
+- thetms
+- thornfall
+- tidalmc
+- tikicraft
+- tilus
+- timeforged
+- titanforge
+- titanmc
+- tklch
+- tntland
+- tofficraft
+- totemsmp
+- towerrealms
+- townworld
+- townyage
+- toxiss
+- trekcraft
+- triadamc
+- tridentmc
+- trollrace
+- tropixmc
+- truemc
+- tsukats
+- tulipsurvival
+- tumafin
+- tunnelmc
+- turksmp
+- twenture
+- twilightrealms
+- twilightshollow
+- twotimesacharm
+- tysmp
+- ustudio
+- ubgnetwork
+- ultraga
+- ultramc
+- ultramine
+- ultimis
+- underhub
+- uneasyvanilla
+- unitedlands
+- unitedmn
+- universalmc
+- unnamecraft
+- unstablerealms
+- upnetis
+- uralcraft
+- urituksel
+- usefern
+- uselessmine
+- valeomc
+- valleycraft
+- valleycraftsmp
+- vammicraft
+- vanguardhc
+- vanillabox
+- vanillagame
+- vanillaland
+- vanillamc
+- vanillasurvival
+- vanillachase
+- vanillagames
+- vanillahigh
+- vanillaland
+- vanillamc
+- vanillamcserver
+- vanillapro
+- vanillaka
+- vanillarobya
+- vanillasd
+- vanillasquad
+- vanillatyme
+- vanilasmp
+- vanoria
+- vardi
+- vaultsmp
+- vayland
+- vcnw
+- vemc
+- vegrom
+- velesgard
+- veldoria
+- venstone
+- verdux
+- veridianmc
+- vernuxsmp
+- versaillesxiv
+- vesperamc
+- vestmine
+- vestriamc
+- vexalmc
+- vexworld
+- viciante
+- victrixmc
+- vigorsmp
+- vimeline
+- vinxmine
+- vinecen
+- virexlifesteal
+- virtuositymc
+- visageland
+- visualmc
+- vclube
+- vmine
+- vnlla
+- voicechatgames
+- voicechatmc
+- voidrp
+- voidcraft
+- voidsent
+- vorplex
+- vortexworld
+- vortexnetwork
+- v8c
+- vforv
+- vulengate
+- vylux
+- waffcarui
+- wafflesmp
+- warhaven
+- warptime
+- wehavetrees
+- wealthprojectonline
+- webbcraft
+- wednerix
+- wellduck
+- wellpocket
+- werdenmine
+- westshield
+- wetnose
+- wetwix
+- whitecraft
+- whiteshield
+- whiteworld
+- wildcraftmc
+- wildercraft
+- wilderion
+- wildgrief
+- wildland
+- wildnetwork
+- willowsmp
+- wintercrestmc
+- wintermc
+- wishplay
+- wisteriarealm
+- withertime
+- wmine
+- wolfland
+- wollymine
+- womplay
+- woodey79
+- worstserverever
+- wtime
+- wubcraft
+- wynncraft
+- x2mc
+- xadale
+- xcsurvival
+- xenoncraft
+- xironite
+- xplay
+- yduels
+- yoursecondhome
+- zelmyra
+- zedarmc
+- zephyrsmp
+- zeroworlds
+- zetrex
+- zillyhuhn
+- zlknpvp
+- zodiaccraft
+- zonecraft
+- zoobastiks
+- zoolands
 
-# 5. Social networks and other
+# 5. Social networks. If an social word appears in a message alongside domain, APVE will detect it as SOCIAL-DISTRIBUTION
 social:
-  - "disgd"
-  - "dsgg"
-  - "tgme"
-  - "vkcom"
-  - "vkme"
+- discord
+- telegram
+- tg
+- youtu
+- youtube
+- max
+- oneme
+- rutube
+- ttv
+- twitch 
+- telegra 
+- twitter
+- tiktok
+- instagram
+- instagr
+
 
 allowed-words:
-  - "zdarova"
-  - "zdorov"
-  - "zdorova"
-  - "privet"
-  - "zdrastvuyte"
-  - "zastrahuyte"
-  - "zastrahuy"
-  - "strahovanie"
-  - "upotreblyat"
-  - "upotreblyatb"
-  - "oskorblyat"
-  - "oskorblyatb"
-  - "potreblenie"
-  - "soblyudat"
-  - "kolebaniya"
-  - "kolebat"
-  - "kolebalsya"
-  - "rubl"
-  - "hleb"
-  - "komanda"
-  - "komandu"
-  - "rebyata"
-  - "rebenok"
-  - "fact"
-  - "who"
-  - "whom"
-  - "much"
-  - "match"
-  - "piece"
-  - "peace"
-  - "beach"
-  - "block"
-  - "pvp"
-  - "pve"
-  - "afk"
-  - "spawn"
-  - "home"
-  - "tpa"
-  - "hue"
-  - "hues"
-  - "retardant"
-  - "retarder"
-  - "dickens"
-  - "sped"
-  - "crystal"
-  - "method"
-  - "department"
-  - "nutmeg"
-  - "oatmeal"
-  - "welcome"
-  - "mebel"
-  - "trebovat"
-  - "nebo"
-  - "serebro"
-  - "nablyudat"
-  - "sablya"
-  - "opazdyvat"
-  - "mudry"
-  - "bermuda"
-  - "pedal"
-  - "torpedo"
-  - "vikipedia"
-  - "sukno"
-  - "barsuk"
-  - "shlyupa"
-  - "moroz"
-  - "mramor"
-  - "london"
-  - "matematika"
-  - "format"
-  - "avtomat"
-  - "aromat"
-  - "geroy"
-  - "narkoz"
-  - "metod"
-  - "shirt"
-  - "batch"
-  - "pitch"
-  - "ditch"
-  - "witch"
-  - "stich"
-  - "duck"
-  - "dock"
-  - "deck"
-  - "medic"
-  - "predict"
-  - "dictate"
-  - "focus"
-  - "factual"
-  - "clas"
-  - "glas"
-  - "gras"
-  - "pas"
-  - "mas"
-  - "asemble"
-  - "asist"
-  - "aset"
-  - "asume"
-  - "cucumber"
-  - "document"
-  - "acumulate"
-  - "county"
-  - "scunthorpe"
-  - "wed"
-  - "weding"
-  - "sweden"
-  - "shoe"
-  - "scrap"
-  - "scrape"
-  - "chore"
-  - "shore"
-  - "popcorn"
-  - "methane"
-  - "mathematics"
-  - "comand"
-  - "aple"
-  - "server"
-  - "helo"
-  - "suces"
-  - "mesage"
+- zdarova
+- zdorov
+- zdorova
+- privet
+- zdrastvuyte
+- zastrahuyte
+- zastrahuy
+- strahovanie
+- upotreblyat
+- upotreblyatb
+- oskorblyat
+- oskorblyatb
+- potreblenie
+- soblyudat
+- kolebaniya
+- kolebat
+- kolebalsya
+- rubl
+- hleb
+- komanda
+- komandu
+- rebyata
+- rebenok
+- fact
+- who
+- whom
+- much
+- match
+- piece
+- peace
+- beach
+- block
+- pvp
+- pve
+- mazb
+- afk
+- spawn
+- home
+- tpa
+- hue
+- hues
+- retardant
+- retarder
+- dickens
+- sped
+- crystal
+- method
+- department
+- nutmeg
+- oatmeal
+- welcome
+- mebel
+- trebovat
+- nebo
+- serebro
+- nablyudat
+- sablya
+- opazdyvat
+- mudry
+- bermuda
+- pedal
+- torpedo
+- vikipedia
+- sukno
+- barsuk
+- shlyupa
+- moroz
+- mramor
+- london
+- matematika
+- format
+- avtomat
+- aromat
+- geroy
+- narkoz
+- metod
+- shirt
+- batch
+- pitch
+- ditch
+- witch
+- stich
+- duck
+- dock
+- deck
+- medic
+- predict
+- dictate
+- focus
+- factual
+- clas
+- glas
+- gras
+- pas
+- mas
+- asemble
+- asist
+- aset
+- asume
+- cucumber
+- document
+- acumulate
+- county
+- scunthorpe
+- wed
+- weding
+- sweden
+- shoe
+- scrap
+- scrape
+- chore
+- shore
+- popcorn
+- methane
+- mathematics
+- comand
+- aple
+- server
+- helo
+- suces
+- mesage
+- myth
+- sosiska
+- sosiski
+- victim
 
 adult-words:
-  - "gashish"      
-  - "anasha"         
-  - "marihuyana"   
-  - "marihuana"
-  - "kosyak"        
-  - "boshki"        
-  - "geroin"        
-  - "kokain"         
-  - "kokos"         
-  - "methamfetamin"  
-  - "amfetamin"     
-  - "ekstazi"       
-  - "spays"            
-  - "narkotik"       
-  - "psylocybin"
-  - "marki"                 
-  - "weed"
-  - "marijuana"
-  - "cannabis"
-  - "hashish"
-  - "ganja"
-  - "cocaine"
-  - "heroin"
-  - "methamphetamine"
-  - "amphetamine"
-  - "ecstasy"
-  - "molly"
-  - "fentanyl"
-  - "ketamine"
-  - "shrooms"
-  - "drugdealer"
-  - "narcotics"
-  - "meth"
-  - "klitor"        
-  - "vlagalische"   
-  - "sperma"        
-  - "erekcia"        
-  - "minet"          
-  - "kunilingus"    
-  - "analseks"     
-  - "masturbir"      
-  - "drochat"       
-  - "orgazm"        
-  - "trakhat"        
-  - "grupovuha"      
-  - "porno"        
-  - "striptiz"      
-  - "blowjob"
-  - "handjob"
-  - "masturbate"
-  - "orgasm"
-  - "ejaculate"
-  - "cumshot"
-  - "gangbang"
-  - "pornhub"
-  - "onlyfans"
-  - "sexting"
-  - "nudes"
-  - "horny"
-  - "intercourse"
-  - "genitals"
- 
+- gashish
+- anasha
+- marihuyana
+- marihuana
+- kosyak
+- boshki
+- geroin
+- kokain
+- kokos
+- methamfetamin
+- amfetamin
+- ekstazi
+- spays
+- narkotik
+- psylocybin
+- marki
+- weed
+- marijuana
+- cannabis
+- hashish
+- ganja
+- cocaine
+- heroin
+- methamphetamine
+- amphetamine
+- ecstasy
+- fentanyl
+- ketamine
+- drugdealer
+- narcotics
+- meth
+- klitor
+- vlagalische
+- sperma
+- erekcia
+- minet
+- kunilingus
+- analseks
+- masturbir
+- drochat
+- drochka
+- orgazm
+- trakhat
+- porno
+- striptiz
+- blowjob
+- handjob
+- masturbate
+- orgasm
+- ejaculate
+- cumshot
+- gangbang
+- pornhub
+- onlyfans
+- sexting
+- nudes
+- horny
+- intercourse
+- genitals
+- sisbki
+- penis
+- escort
+- pedofil
+- pedofiliya
+- hentaj
+- intim
+- pedophile
+- mefedron
+
+
 adult-roots:
-  - "kokain"
-  - "geroin"
-  - "gashish"        
-  - "zakladk"       
-  - "fentanil"
-  - "fentanyl"
-  - "mdma"
-  - "methamphet"
-  - "amfetamin"
-  - "kristalmeth"   
-  - "masturbat"
-  - "pornhub"
-  - "onlyfans"
-  - "blowjob"
-  - "handjob"
-  - "cumshot"
-  - "gangbang"
+- kokain
+- geroin
+- gashish
+- zakladk
+- fentanil
+- fentanyl
+- mdma
+- methamphet
+- amfetamin
+- kristalmeth
+- masturbat
+- pornhub
+- onlyfans
+- blowjob
+- handjob
+- cumshot
+- gangbang
 
 # Staff tituls. Needs to detect staff insult. If an insult word appears in a message alongside any staff title, APVE will detect it as staff insult.
 staff-tituls:
-  - "admin"
-  - "helper"
-  - "sozdatel"
-  - "vladelec"
-  - "kurator"
-  - "curator"
-  - "staff"
-  - "moderator"
-  - "moder"
+- admin
+- helper
+- sozdatel
+- vladelec
+- kurator
+- curator
+- staff
+- moderator
+- moder
+- owner
 
 
-
+# Must be configured to your punishment plugin syntax
 punishments:
-  mute-command: "mute %player% %duration% %reason%"
-  ban-command: "ban %player% %duration% %reason%"
-  banip-command: "ipban %ip% %duration% %reason%"
-  kick-command: "kick %player% %reason%"
-
+  mute-command: mute %player% %duration% %reason%
+  ban-command: ban %player% %duration% %reason%
+  banip-command: banip %ip% %duration% %reason%
+  kick-command: kick %player% %reason%
+  
   punishments-is-enabled: true
-
+  
+  # If true, APVE will automatically set aproppiate command syntax automaticaly based on the installed punishment plugin.
+  auto-detect-plugin: true
+  
   perm-keywords:
-    - "permanent"
-    - "perm"
-    - "infinity"
-    - "inf"
-    - "-1"
+  - permanent
+  - perm
+  - infinity
+  - inf
+  - '-1'
 
 priority:
   caps: 1
@@ -496,99 +1802,74 @@ console-log: false
 notifies: true
 
 
+# If there are no message keys below this note, don't worry, plugin will generate this keys from selected localization after a first server start after putting APVE jar file into the plugins directory.
 
 warns:
   warn-limit: 2
   warn-limit-is-enabled: true
-  warn-message: |
-      &cYou have been warned by A.P.V.E. due to rule violating.
-      &cPlease, communicate in the chat without any rules-violating words/meanings.
-  last-warn-message: |
-      &cThis is last warn. Don't write the rule-violating message.
-      &cOtherwise, you will be punished by A.P.V.E.
-
+  
   warn_reset_when_server_restarts: true
   temporary-warns: true
-  warn-reset-time: "1h"
+  warn-reset-time: 1h
   warn_reset_count: 2
   warns-is-enabled: true
 
 insult:
   is-enabled: true
   punishment-is-enabled: true
-  duration: "30m"
-  reason: "&cYou have been muted due to insulting."
-  type: "mute"
-  blocking-reason: "&cYour message was blocked because it contains insults."
+  duration: 30m
+  type: mute
   blocking: true
-  censor-reason: "&cYour message was censored because it contains insults."
   censor: false
 
 family-insult:
   is-enabled: true
   punishment-is-enabled: true
-  duration: "8h"
-  reason: "&cYou have been muted due to insulting relatives."
-  type: "mute"
-  blocking-reason: "&cYour message was blocked because it contains family insults."
+  duration: 8h
+  type: mute
   blocking: true
-  censor-reason: "&cYour message was censored because it contains family insults."
   censor: false
 
 ad-dist:
   is-enabled: true
   punishment-is-enabled: true
-  duration: "perm"
-  reason: "&cYou have been banned from the server due to distribution of advertisement."
-  type: "banip"
-  blocking-reason: "&cYour message was blocked because it contains advertisement distribution."
+  duration: 30d
+  type: banip
   blocking: true
-  censor-reason: "&cYour message was censored because it contains advertisement distribution."
   censor: false
 
 soc-media-dist:
   is-enabled: true
   punishment-is-enabled: true
-  duration: "180m"
-  reason: "&cYou have been banned from the server due to social media distribution."
-  type: "ban"
-  blocking-reason: "&cYour message was blocked because it contains social media distribution."
+  duration: 180m
+  type: ban
   blocking: true
-  censor-reason: "&cYour message was censored because it contains social media distribution."
   censor: false
 
 adult-content:
   is-enabled: true
-  punishment-is-enabled: true 
-  type: "mute"
-  duration: "8h"
-  reason: "&cYou have been muted due to 18+ content mention."
-  blocking-reason: "&cYour message was blocked because it contains adult (18+) content."
+  punishment-is-enabled: true
+  type: mute
+  duration: 8h
   blocking: true
-  censor-reason: "&cYour message was censored because it contains adult (18+) content."
   censor: false
 
 staff-insult:
   is-enabled: true
   punishment-is-enabled: true
-  type: "mute"
-  duration: "12h"
-  reason: "&cYou have been muted due to staff insulting."
-  blocking-reason: "&cYour message was blocked because it contains staff insulting."
+  type: mute
+  duration: 12h
   blocking: true
-  censor-reason: "&cYour message was censored because it contains staff insulting"
   censor: false
-      
+
 spam:
   is-enabled: true
   punishment-is-enabled: true
   max-similar-messages: 3
   time-window-seconds: 60
-  similarity-threshold: 0.90
-  type: "mute"
-  duration: "20m"
-  reason: "&cYou have been muted due to spam."
-  blocking-reason: "&cYour message was blocked because it is a spam."
+  similarity-threshold: 0.9
+  type: mute
+  duration: 20m
   blocking: false
 
 caps:
@@ -596,82 +1877,64 @@ caps:
   punishment-is-enabled: false
   min-message-length: 6
   min-caps-percentage: 70
-  type: "mute"
-  duration: "15m"
-  reason: "&cYou have been muted due to excessive caps."
-  blocking-reason: "&cYour message was blocked because it is written in upper case."
+  type: mute
+  duration: 15m
   blocking: false
-  censor-reason: "&cYour message was censored because it is written in upper case."
   censor: false
 
 intercepted-commands:
-  - "msg"
-  - "w"
-  - "tell"
-  - "m"
-  - "whisper"
-  - "pm"
-  - "r"
-  - "reply"
-  - "nc"
-  - "tc"
+- msg
+- w
+- tell
+- m
+- whisper
+- pm
+- r
+- reply
+- bc
+- broadcast
+- tc
+- nc
+- etell
+- emsg
 
+# Because specific text normalization, domains like .gg must be written with only one symbol (g, not gg) Also, write domains without dots.
 blocked-domains:
-  - "ru"
-  - "com"
-  - "net"
-  - "org"
-  - "gg"
-  - "io"
-  - "xyz"
-  - "site"
-  - "online"
-  - "top"
-  - "me"
-  - "fun"
+- ru
+- com
+- net
+- org
+- g
+- io
+- xyz
+- site
+- online
+- top
+- me
+- fun
+- top
+- pw
+- mc
+- fun
+- pro
+- su
+- eu
+- io
+- online
+- uk
+- ph
+- be
+- tv
+- 20tps
 
 
 command-msg:
-  perm-fail: "&cAccess denied."
-  help-command-view-req: "&cUnknown commmand. Type /apve help for see available commands. "
-  help-command-msg: 
-    - "&aAvailable commands:"
-    - "&2/apve reload — Reload APVE's configuration"
-    - "&2/apve warns show <nickname> — View the player's warns history"
-    - "&2/apve warns remove <nickname> <integer> — Remove the player's warns. The removing warns equals <integer> argument."
-    - "&2/apve warns clear <nickname> — Remove all the player's warns."
-    - "&2/apve notify toggle — Toggles notifies about player's violations."
-
-  cfg-reload-msg: "&1Reloading configuration..."
-  invalid-syntax: "&cInvalid syntax. Usage: {usage}"
-  invalid-number: "&cArgument '{arg}' must be a valid number."
-
-  violation-notify-msg: "&cNOTIFY: Player &e{player} &chas sended message with &f{message} &cwhich violates the &4{type} &cdue to its similarity/equality to &e{word}."
-  notify-activate-msg: "&aSucessfully &2enabled &anotifies about the player's violations."
-  notify-disabled-msg: "&aSucessfully &4disabled &anotifies about the player's violations."
-  player-only: "&cExecutor must be a player."
-  
-  warns:
-    no-warns: "&ePlayer {player} currently has no active warns."
-    show: "&aPlayer &e{player} &ahas &c{amount} &aactive warns. Highest violation rule: &c{violation}&a."
-    removed: "&aSuccessfully removed &e{amount} &awarns from &e{player}&a. Remaining warns: &e{left}&a."
-    cleared: "&aAll warns successfully cleared for &e{player}&a."
-
   check:
-    header: "&8[&bA.P.V.E Word Checker&8]"
-    raw: "&7Input text: &f{raw}"
-    normalized: "&7Normalized text: {normalized}"
-    status: "&7Check status: {status_color}{status}"
-    matched-word: "&7Founded word: &e{word}"
-    dict-word: "&7From-dictionary sample: &6{dict}"
-    detail: "&7Check details: &b{detail}"
     status-colors:
-      malicious: "&c"
-      suspicious: "&e"
-      none: "&a"
+      malicious: '&c'
+      suspicious: '&e'
+      none: '&a'
 
 
 
 
-
-  

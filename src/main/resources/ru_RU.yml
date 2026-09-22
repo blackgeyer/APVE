@@ -1,0 +1,94 @@
+warns:
+  warn-message: |
+      <red>Ваше сообщение не прошло проверку на допустимость.
+      <red>Пожалуйста, не нарушайте правила чата.
+  last-warn-message: |
+      <red>Вы были предупреждены за нарушение правил чата.
+      <red>Повторное нарушение приведёт к санкциям.
+
+insult:
+  reason: "Оскорбление."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Оскорбление."
+  censor-reason: "<red>Ваше сообщение было зацензурено: Оскорбление."
+
+family-insult:
+  reason: "Оскорбление родных."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Оскорбление родных."
+  censor-reason: "<red>Ваше сообщение было зацензурено: Оскорбление родных."
+
+ad-dist:
+  reason: "Реклама."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Реклама."
+  censor-reason: "<red>Ваше сообщение было зацензурено: Реклама."
+
+soc-media-dist:
+  reason: "Реклама соц-сетей."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Реклама соц-сетей."
+  censor-reason: "<red>Ваше сообщение было зацензурено: Реклама соц-сетей"
+
+adult-content:
+  reason: "Упоминание взрослого контента."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Содержание взрослого контента"
+  censor-reason: "<red>Ваше сообщение было зацензурено: Содержание взрослого контента."
+
+staff-insult:
+  reason: "Оскорбления администрации проекта."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Оскорбление администрации проекта."
+  censor-reason: "<red>Ваше сообщение было зацензурено: Оскорбление администрации проекта."
+      
+spam:
+  reason: "Спам."
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Спам."
+
+caps:
+  reason: "Злоупотребление капсом"
+  blocking-reason: "<red>Ваше сообщение было заблокировано: Злоупотребление капсом"
+  censor-reason: "<red>Ваше сообщение было зацензурено: Злоупотребление капсом."
+
+command-msg:
+  perm-fail: "Отказано в доступе."
+  help-command-view-req: "<red>Неизвестная команда. Введите /apve help для просмотра доступных команд."
+  help-command-msg: 
+    - "<green>Доступные команды:"
+    - "<dark_green>/apve reload — Перезагрузить конфигурацию APVE"
+    - "<dark_green>/apve warns show <никнейм> — Просмотреть историю предупреждений игрока"
+    - "<dark_green>/apve warns remove <никнейм> <число> — Снять предупреждения у игрока. Количество снимаемых предупреждений равно аргументу <число>."
+    - "<dark_green>/apve warns clear <никнейм> — Снять все предупреждения у игрока."
+    - "<dark_green>/apve notify toggle — Включить/выключить уведомления о нарушениях игроков."
+    - "<dark_green>/apve check <text> — Проверяет аргумент 'text' на нарушение правил."
+
+  cfg-reload-msg: "<dark_blue>Перезагрузка конфигурации..."
+  invalid-syntax: "<red>Неверный синтаксис. Использование: {usage}"
+  invalid-number: "<red>Аргумент '{arg}' должен быть корректным числом."
+
+  violation-notify-msg: "<red>УВЕДОМЛЕНИЕ: Игрок <yellow>{player} <red>отправил сообщение <white>{message}<red>, которое нарушает <dark_red>{type} <red>из-за схожести/совпадения с <yellow>{word}."
+  notify-activate-msg: "<green>Уведомления о нарушениях игроков успешно <dark_green>включены<green>."
+  notify-disabled-msg: "<green>Уведомления о нарушениях игроков успешно <dark_red>выключены<green>."
+  player-only: "<red>Эту команду может выполнять только игрок."
+  
+  warns:
+    no-warns: "<yellow>У игрока {player} на данный момент нет активных предупреждений."
+    show: "<green>У игрока <yellow>{player} <red>{amount} <green>активных предупреждений. Самое строгое нарушение: <red>{violation}<green>."
+    removed: "<green>Успешно снято <yellow>{amount} <green>предупреждений у <yellow>{player}<green>. Оставшиеся предупреждения: <yellow>{left}<green>."
+    cleared: "<green>Все предупреждения игрока <yellow>{player} <green>успешно очищены."
+
+  check:
+    header: "<dark_gray>[<aqua>A.P.V.E Проверка Слов<dark_gray>]"
+    raw: "<gray>Исходный текст: <white>{raw}"
+    normalized: "<gray>Нормализованный текст: {normalized}"
+    status: "<gray>Статус проверки: {status_color}{status}"
+    matched-word: "<gray>Найдено слово: <yellow>{word}"
+    dict-word: "<gray>Образец из словаря: <gold>{dict}"
+    detail: "<gray>Детали проверки: <aqua>{detail}"
+
+  check-in-cmd:
+    header: "A.P.V.E Проверка Слов"
+    raw: "Исходный текст: {raw}"
+    normalized: "Нормализованный текст: {normalized}"
+    status: "Статус проверки: {status_color}{status}"
+    matched-word: "Найдено слово: {word}"
+    dict-word: "Образец из словаря: {dict}"
+    detail: "Детали проверки: {detail}"
+
+
+
