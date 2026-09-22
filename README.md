@@ -3,7 +3,7 @@
 ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![API](https://img.shields.io/badge/Dependency-PacketEvents-orange.svg)
 
-> **Author / Автор:** blackgeyer | **Version / Версия:** 1.3.1 | **License / Лицензия:** GPLv3  
+> **Author / Автор:** blackgeyer | **Version / Версия:** 1.3.5 | **License / Лицензия:** GPLv3  
 > 📹 **Plugin Showcase / Видео с демонстрацией:** [Watch on YouTube](https://youtu.be/tICOrnjpwYc?si=7kcUQCJTbV0Q8HvM)
 
 ---
