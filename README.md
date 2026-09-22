@@ -10,7 +10,9 @@
 
 ## 🇬🇧 English
 
-High-performance, fully asynchronous Minecraft chat moderation plugin. Designed to keep your server chat clean with zero main-thread overhead. Powered by **PacketEvents**, **Aho-Corasick** pattern matching, and **Fuzzy Matching** fallback system.
+Forget about ads, sharing adult content, insults, and other nonsense in the chat if you're using APVE!
+
+APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Designed to keep your server chat clean with zero main-thread overhead. Powered by **PacketEvents**, **Aho-Corasick** pattern matching, and **Fuzzy Matching** fallback system.
 
 ### 🚀 Key Features & Architecture
 * **Two-Stage Pattern Matching ($O(N)$ + Fuzzy Fallback):** Words are not strictly checked by 100% exact equality alone. The plugin first uses lightning-fast Aho-Corasick string matching. If an exact match is not found in the dictionary, it automatically triggers **Fuzzy Matching** to compare the word's similarity against dictionary patterns, catching bypasses, intentional typos, and modified letters.
@@ -62,7 +64,9 @@ High-performance, fully asynchronous Minecraft chat moderation plugin. Designed 
 
 ## 🇷🇺 Русский
 
-Высокопроизводительный асинхронный плагин модерации чата. Поддерживает чистоту сервера в автоматическом режиме с нулевой нагрузкой на главный поток сервера. Работает на базе **PacketEvents**, алгоритма **Aho-Corasick** и интеллектуальной системы **Fuzzy Matching**.
+Забудьте об рекламе, взрослом контенте, оскорблениях и прочей ереси в чате если вы используете APVE!
+
+APVE: Высокопроизводительный асинхронный плагин модерации чата. Поддерживает чистоту сервера в автоматическом режиме с нулевой нагрузкой на главный поток сервера. Работает на базе **PacketEvents**, алгоритма **Aho-Corasick** и интеллектуальной системы **Fuzzy Matching**.
 
 ### 🚀 Архитектурные преимущества
 * **Двухэтапная проверка ($O(N)$ + Fuzzy Matching):** Проверка слов не ограничивается строго 100% точным совпадением. Плагин сначала выполняет ультрабыстрый поиск через алгоритм Ахо-Корасик. Если точное совпадение в словаре не найдено, автоматически включается **Fuzzy Matching** (нечёткое сравнение), которое сопоставляет степень схожести слова с паттернами из словаря. Это позволяет эффективно ловить обходы, опечатки и намеренно искажённые слова.
