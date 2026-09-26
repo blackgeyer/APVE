@@ -6,6 +6,8 @@
 > **Author / Автор:** blackgeyer | **Version / Версия:** 1.3.5 | **License / Лицензия:** GPLv3  
 > 📹 **Plugin Showcase / Видео с демонстрацией:** [Watch on YouTube](https://youtu.be/tICOrnjpwYc?si=7kcUQCJTbV0Q8HvM)
 
+> **Documentation**: https://blackgeyer.github.io/APVE/
+
 ---
 
 ## 🇬🇧 English
@@ -38,7 +40,7 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 ### 💻 Commands & Permissions
 | Command | Description | Permission | Default |
 | :--- | :--- | :--- | :--- |
-| `/apve` | Base command for plugin management. | `apve.use` | Everyone |
+| `/apve` | Base command for plugin management. | `apve.use` | OP |
 | `/apve reload` | Reloads plugin configuration. | `apve.reload` | OP |
 | `/apve warns show {player}` | Displays current warning count for a player. | `apve.warns.show` | OP |
 | `/apve warns remove {player} {amount}` | Removes a specified number of warnings from a player. | `apve.warns.remove` | OP |
@@ -50,14 +52,14 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 ### 🔑 Additional Permissions & Immunity Nodes
 | Permission | Description | Default |
 | :--- | :--- | :--- |
-| `apve.violation.notify` | Allows receiving real-time chat notifications about player violations. | OP |
-| `apve.insult.immune` | Grants immunity against general insult detections. | OP |
+| `apve.violation.notify` | Allows receiving real-time chat notifications about player violations. | False |
+| `apve.insult.immune` | Grants immunity against general insult detections. | False |
 | `apve.fam.insult.immune` | Grants immunity against family insult detections. | False |
 | `apve.caps.immune` | Grants immunity against upper-case (caps) filter. | False |
 | `apve.spam.immune` | Grants immunity against spam filter. | False |
 | `apve.adult.content.immune` | Grants immunity against adult content filter. | False |
-| `apve.social.immune` | Grants immunity against social media links filter. | OP |
-| `apve.advertisement.immune` | Grants immunity against advertisement and external resource sharing. | OP |
+| `apve.social.immune` | Grants immunity against social media links filter. | False |
+| `apve.advertisement.immune` | Grants immunity against advertisement and external resource sharing. | False |
 | `apve.staff.insult.immune` | Grants immunity against staff insult detections. | False |
 
 ---
@@ -92,7 +94,7 @@ APVE: Высокопроизводительный асинхронный пла
 ### 💻 Команды и права
 | Команда | Описание | Право | По умолчанию |
 | :--- | :--- | :--- | :--- |
-| `/apve` | Базовая команда управления плагином. | `apve.use` | Все |
+| `/apve` | Базовая команда управления плагином. | `apve.use` | OP |
 | `/apve reload` | Перезагружает конфигурацию плагина. | `apve.reload` | OP |
 | `/apve warns show {player}` | Показывает количество предупреждений игрока. | `apve.warns.show` | OP |
 | `/apve warns remove {player} {число}` | Снимает указанное количество предупреждений. | `apve.warns.remove` | OP |
@@ -105,13 +107,13 @@ APVE: Высокопроизводительный асинхронный пла
 | Право | Описание | По умолчанию |
 | :--- | :--- | :--- |
 | `apve.violation.notify` | Позволяет получать уведомления о нарушениях игроков в чате в реальном времени. | OP |
-| `apve.insult.immune` | Иммунитет к наказаниям за обычные оскорбления. | OP |
+| `apve.insult.immune` | Иммунитет к наказаниям за обычные оскорбления. | False |
 | `apve.fam.insult.immune` | Иммунитет к наказаниям за оскорбление родных. | False |
 | `apve.caps.immune` | Иммунитет к фильтру сообщений верхним регистром (капс). | False |
 | `apve.spam.immune` | Иммунитет к фильтру спама. | False |
 | `apve.adult.content.immune` | Иммунитет к фильтру контента для взрослых (18+). | False |
-| `apve.social.immune` | Иммунитет к фильтру распространения соцсетей. | OP |
-| `apve.advertisement.immune` | Иммунитет к фильтру рекламы и сторонних ресурсов. | OP |
+| `apve.social.immune` | Иммунитет к фильтру распространения соцсетей. | False |
+| `apve.advertisement.immune` | Иммунитет к фильтру рекламы и сторонних ресурсов. | False |
 | `apve.staff.insult.immune` | Иммунитет к наказаниям за оскорбление администрации (Staff). | False |
 
 ---
