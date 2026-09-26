@@ -1,0 +1,1324 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The advanced documentation about APVE chat filter plugin.">
+      
+      
+      
+      
+        <link rel="prev" href="../installation/">
+      
+      
+        <link rel="next" href="../normalizer/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Configuration - apve-page</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="apve-page" class="md-header__button md-logo" aria-label="apve-page" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            apve-page
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="apve-page" class="md-nav__button md-logo" aria-label="apve-page" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    apve-page
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Main
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#thresholds-and-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thresholds and language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dictionaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dictionaries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dictionaries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#family" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Family
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expressive-words" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expressive Words
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advertisement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advertisement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#social-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Social distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allowed-words" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed words
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#staff-insults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staff insults
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#punishments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Punishments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Punishments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-command-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action command syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notifying-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notifying parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#action-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action blocks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Action blocks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#warn-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Warn block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#violation-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Violation blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spam-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spam block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caps-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caps block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intercepted-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intercepted commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blocked-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocked domains
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#apve-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /apve check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../normalizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Normalizer Work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands and permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../history/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    History
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#thresholds-and-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thresholds and language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dictionaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dictionaries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dictionaries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#family" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Family
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expressive-words" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expressive Words
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advertisement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advertisement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#social-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Social distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allowed-words" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed words
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#staff-insults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staff insults
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#punishments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Punishments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Punishments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-command-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action command syntax
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notifying-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notifying parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#action-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action blocks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Action blocks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#warn-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Warn block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#violation-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Violation blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spam-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spam block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caps-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caps block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intercepted-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intercepted commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blocked-domains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blocked domains
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#apve-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /apve check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="configuration">Configuration</h1>
+<p>After running <strong>APVE</strong> for the first time, a default configuration will be generated in the <code>plugins/APVE</code> directory, and APVE will <strong>apply the messages localization</strong> according to your system's current localization.</p>
+<p><strong>APVE</strong> will apply the correct syntax of the punishment command in the configuration <strong>if</strong> you have installed LibertyBans, AdvancedBans or LiteBans. Otherwise, you need to write the syntax manually based on your installed punishment plugin.</p>
+<h3 id="thresholds-and-language">Thresholds and language</h3>
+<p>Word similarity thresholds relative to any prohibited word.
+If a word's similarity does not exceed any threshold below, APVE will pass it.
+If a word's similarity equals or exceeds the medium threshold, APVE marks the word as SUSPICIOUS but will pass it.
+If a word's similarity equals or exceeds the high threshold, APVE marks the word as MALICIOUS.
+Some benign words may be similar to malicious ones. Consequently, a high threshold between <code>0.75</code> and <code>0.80</code> is strongly recommended to avoid false positives while still catching potentially malicious words.
+A medium threshold between <code>0.55</code> and <code>0.60</code> is strongly recommended to avoid passing specific or typo-entered malicious words.</p>
+<p><code>Language</code> is responsible for APVE's messages localization. Available values: <code>ru</code>, <code>en</code> and <code>auto</code>.
+If <code>auto</code>, APVE will apply messages localization according to your system's current localization.
+APVE will apply <code>en_US.yml</code> localization if your system's localization does not match any of the available localizations.</p>
+<pre><code class="language-yaml">language: auto
+
+thresholds:
+  high: 0.78 
+  medium: 0.57 
+</code></pre>
+<h2 id="dictionaries">Dictionaries</h2>
+<p>Before writing words to the dictionaries, ensure you meet the following prerequisites:
+It should be written only using transliteration and the Latin alphabet (example: <code>мразь</code> ——&gt; <code>mrazb</code>), without any symbols, numbers or spaces, in lowercase and phrased accounting for the normalizer's work.
+Beware of adding slang and short words to the dictionaries, as this may cause false positives.
+You can see information about normalizer work below.</p>
+<pre><code class="language-yaml">insult-words:
+- eblan
+- mrazb
+- dolboeb
+# ...
+</code></pre>
+<h3 id="family">Family</h3>
+<p>Family pronouns. If APVE detects a message that contains a family pronoun alongside an insult word, it will detect it as FAMILY_INSULT.</p>
+<pre><code class="language-yaml">family-insult-words:
+- father
+- mother
+- matb
+# ...
+</code></pre>
+<p>If APVE detects a word that has any of the inappropriate roots below, it detects it as a violation corresponding to the root's context.</p>
+<pre><code class="language-yaml">family-roots:
+- roditel
+- opek
+- mother
+# ...
+</code></pre>
+<pre><code class="language-yaml">bad-roots:
+- eblan
+- dolboeb
+- huesos
+# ...
+</code></pre>
+<h3 id="expressive-words">Expressive Words</h3>
+<p>Responsible for allowing players to express their emotions with the words below.
+If a word's similarity is higher than any threshold but it is <strong>identical to an expressive word</strong>, APVE will pass it.</p>
+<pre><code class="language-yaml">expressive-words:
+- pizda
+- pizdec
+- blyatb
+# ...
+</code></pre>
+<h3 id="advertisement">Advertisement</h3>
+<p>APVE detects a message as advertisement if it has <strong>any ad-words</strong> below alongside a domain.
+You should write only the <strong>advertising resource</strong>, not the IP. (Example: <code>2b2t</code> instead of <code>2b2t.org</code>.)
+Words to ad-words can be written with numbers.</p>
+<pre><code class="language-yaml">ad-words:
+- 10b10t
+- 123c
+- 1f2d
+# ...
+</code></pre>
+<h3 id="social-distribution">Social distribution</h3>
+<p>APVE will detect a message as SOCIAL_DIST if it has a social word alongside a domain.
+You should write social words the same way as ad words — no IP, only the advertising resource.</p>
+<pre><code class="language-yaml">social:
+- discord
+- telegram
+- tg
+# ...
+</code></pre>
+<h3 id="allowed-words">Allowed words</h3>
+<p>Responsible for avoiding false positives if a benign word has an inappropriate root or resembles a prohibited word.
+APVE will pass a word if it is identical to any of the <code>allowed-words</code>.</p>
+<pre><code class="language-yaml">allowed-words:
+- corn
+- mazb
+- scunthorpe
+# ...
+</code></pre>
+<pre><code class="language-yaml">adult-words:
+- pornhub
+- anasha
+- methemfethamin
+# ...
+</code></pre>
+<pre><code class="language-yaml">adult-roots:
+- porn
+- geroin
+- intim
+# ...
+</code></pre>
+<h3 id="staff-insults">Staff insults</h3>
+<p>APVE will detect a message as STAFF_INSULT if it contains a staff title alongside any insult word.</p>
+<pre><code class="language-yaml">staff-tituls:
+- admin
+- helper
+- sozdatel
+# ...
+</code></pre>
+<h2 id="punishments">Punishments</h2>
+<p>All parameters responsible for applying actions (punishments) to violators.</p>
+<h3 id="action-command-syntax">Action command syntax</h3>
+<p>Commands that are dispatched according to the selected action in violation blocks. Must be <strong>configured</strong> for your <strong>punishment plugin's command syntax</strong>.</p>
+<p>The command's arguments <strong>must be in the following order</strong>:
+* <code>"command" %player% %duration% %reason%</code></p>
+<p>Otherwise, the plugin <strong>will not</strong> apply the action correctly.</p>
+<pre><code class="language-yaml">punishments:
+  mute-command: mute %player% %duration% %reason%
+  ban-command: ban %player% %duration% %reason%
+  banip-command: banip %ip% %duration% %reason%
+  kick-command: kick %player% %reason%
+</code></pre>
+<h3 id="other">Other</h3>
+<p>If <code>punishments-is-enabled</code> is false, <strong>APVE will not</strong> apply any action to the violator, regardless of warnings etc.</p>
+<p>If <code>auto-detect-plugin</code> is true, APVE will automatically set the command syntax based on the installed punishment plugin.
+APVE can automatically set the command syntax <strong>only for</strong> <code>LibertyBans</code>, <code>AdvancedBans</code> and <code>LiteBans</code>. Otherwise, you will need to configure the command syntax <strong>manually</strong>.</p>
+<pre><code class="language-yaml">auto-detect-plugin: true
+punishments-is-enabled: true
+
+perm-keywords:
+- permanent
+- perm
+- infinity
+- inf
+- '-1'
+</code></pre>
+<p>Responsible for setting violation severity levels.
+The larger the integer, the more severe the violation. Based on this, APVE will punish the violator for <strong>the most severe</strong> of all committed violations.</p>
+<pre><code class="language-yaml">priority:
+  caps: 1
+  spam: 2
+  insult: 3
+  adult-content: 4
+  family-insult: 5
+  staff-insult: 6
+  soc-media-dist: 7
+  ad-dist: 8
+</code></pre>
+<h2 id="notifying-parameters">Notifying parameters</h2>
+<p>If true, the plugin will not apply any action or warn to the violators. The plugin will only log every violation.
+This mode <strong>is incompatible with punishments and warns</strong>. Consequently, if you enable this mode alongside other actions, APVE's work <strong>will be aborted or limited</strong>.</p>
+<pre><code class="language-yaml">audit-mode: false
+</code></pre>
+<p>If false, APVE will not send messages about player violations to the console.</p>
+<pre><code class="language-yaml">console-log: false
+</code></pre>
+<p>If true, APVE will send notifications about violations in-game to players who have the <code>apve.violation.notify</code> permission.</p>
+<pre><code class="language-yaml">notifies: true
+</code></pre>
+<h2 id="action-blocks">Action blocks</h2>
+<p>Each violation type has its own configuration block. The common parameters are:</p>
+<ul>
+<li><code>is-enabled</code> — whether this violation type is detected at all.</li>
+<li><code>punishment-is-enabled</code> — whether to apply a punishment upon violation. Requires <code>punishments-is-enabled: true</code> in the <code>punishments</code> block.</li>
+<li><code>duration</code> — punishment duration. Supports time units: <code>s</code> (seconds), <code>m</code> (minutes), <code>h</code> (hours), <code>d</code> (days).</li>
+<li><code>type</code> — punishment type: <code>mute</code>, <code>ban</code>, <code>banip</code> or <code>kick</code>.</li>
+<li><code>blocking</code> — if true, APVE will block the violating message from being delivered to chat.</li>
+<li><code>censor</code> — if true, APVE will replace the violating word with asterisks instead of blocking the entire message. <strong>Not applicable when <code>blocking</code> is true.</strong></li>
+</ul>
+<h3 id="warn-block">Warn block</h3>
+<p>Controls the warning system. Warns are issued to the violator before a punishment is applied, if <code>warns-is-enabled</code> is true.</p>
+<ul>
+<li><code>warn-limit</code> — the number of warns after which the punishment is applied.</li>
+<li><code>warn-limit-is-enabled</code> — whether to apply a punishment upon reaching the warn limit.</li>
+<li><code>warn_reset_when_server_restarts</code> — if true, warns are reset on server restart.</li>
+<li><code>temporary-warns</code> — if true, warns expire after the period defined by <code>warn-reset-time</code>.</li>
+<li><code>warn-reset-time</code> — time after which warns are reset (e.g. <code>1h</code>).</li>
+<li><code>warn_reset_count</code> — number of warns removed when the reset timer expires.</li>
+<li><code>warns-is-enabled</code> — whether the warn system is enabled at all.</li>
+</ul>
+<pre><code class="language-yaml">warns:
+  warn-limit: 2
+  warn-limit-is-enabled: true
+
+  warn_reset_when_server_restarts: true
+  temporary-warns: true
+  warn-reset-time: 1h
+  warn_reset_count: 2
+  warns-is-enabled: true
+</code></pre>
+<h3 id="violation-blocks">Violation blocks</h3>
+<pre><code class="language-yaml">insult:
+  is-enabled: true
+  punishment-is-enabled: true
+  duration: 30m
+  type: mute
+  blocking: true
+  censor: false
+</code></pre>
+<pre><code class="language-yaml">family-insult:
+  is-enabled: true
+  punishment-is-enabled: true
+  duration: 8h
+  type: mute
+  blocking: true
+  censor: false
+</code></pre>
+<pre><code class="language-yaml">ad-dist:
+  is-enabled: true
+  punishment-is-enabled: true
+  duration: 30d
+  type: banip
+  blocking: true
+  censor: false
+</code></pre>
+<pre><code class="language-yaml">soc-media-dist:
+  is-enabled: true
+  punishment-is-enabled: true
+  duration: 180m
+  type: ban
+  blocking: true
+  censor: false
+</code></pre>
+<pre><code class="language-yaml">adult-content:
+  is-enabled: true
+  punishment-is-enabled: true
+  type: mute
+  duration: 8h
+  blocking: true
+  censor: false
+</code></pre>
+<pre><code class="language-yaml">staff-insult:
+  is-enabled: true
+  punishment-is-enabled: true
+  type: mute
+  duration: 12h
+  blocking: true
+  censor: false
+</code></pre>
+<h3 id="spam-block">Spam block</h3>
+<p>The <code>spam</code> block has additional parameters:</p>
+<ul>
+<li><code>max-similar-messages</code> — maximum number of similar messages a player can send within a time window before the violation is triggered.</li>
+<li><code>time-window-seconds</code> — the time window in seconds during which similar messages are counted.</li>
+<li><code>similarity-threshold</code> — minimum similarity ratio for two messages to be considered duplicates. Range: <code>0.0</code>–<code>1.0</code>.</li>
+</ul>
+<pre><code class="language-yaml">spam:
+  is-enabled: true
+  punishment-is-enabled: true
+  max-similar-messages: 3
+  time-window-seconds: 60
+  similarity-threshold: 0.9
+  type: mute
+  duration: 20m
+  blocking: false
+</code></pre>
+<h3 id="caps-block">Caps block</h3>
+<p>The <code>caps</code> block has additional parameters:</p>
+<ul>
+<li><code>min-message-length</code> — minimum message length in characters required for the caps check to apply. Shorter messages are ignored.</li>
+<li><code>min-caps-percentage</code> — minimum percentage of uppercase characters required to trigger the violation.</li>
+</ul>
+<pre><code class="language-yaml">caps:
+  is-enabled: true
+  punishment-is-enabled: false
+  min-message-length: 6
+  min-caps-percentage: 70
+  type: mute
+  duration: 15m
+  blocking: false
+  censor: false
+</code></pre>
+<h3 id="intercepted-commands">Intercepted commands</h3>
+<p>A list of commands whose arguments will be scanned for violations the same way as regular chat messages. Useful for covering private messaging commands so violations are not bypassed via <code>/msg</code> or similar.</p>
+<pre><code class="language-yaml">intercepted-commands:
+- msg
+- w
+- tell
+# ...
+</code></pre>
+<h3 id="blocked-domains">Blocked domains</h3>
+<p>A list of domain suffixes that APVE looks for when detecting advertisement and social distribution violations. Due to the text normalization process, domains like <code>.gg</code> must be written with a single character (e.g. <code>g</code>, not <code>gg</code>). Write all domains without dots.</p>
+<pre><code class="language-yaml">blocked-domains:
+- ru
+- com
+- net
+# ...
+</code></pre>
+<h2 id="command-parameters">Command parameters</h2>
+<h3 id="apve-check">/apve check</h3>
+<p>The <code>command-msg.check</code> block configures the colors used in the output of the <code>/apve check</code> command, which displays the analysis result for a given player message.</p>
+<ul>
+<li><code>malicious</code> — color code applied to words classified as MALICIOUS.</li>
+<li><code>suspicious</code> — color code applied to words classified as SUSPICIOUS.</li>
+<li><code>none</code> — color code applied to words that passed the check with no flags.</li>
+</ul>
+<pre><code class="language-yaml">command-msg:
+  check:
+    status-colors:
+      malicious: '&amp;c'
+      suspicious: '&amp;e'
+      none: '&amp;a'
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
