@@ -4,7 +4,7 @@
 ![API](https://img.shields.io/badge/Dependency-PacketEvents-orange.svg)
 ![Folia Supported](https://img.shields.io/badge/Folia-Supported-brightgreen.svg)
 
-> **Author / Автор:** blackgeyer | **Version / Версия:** 1.3.5 | **License / Лицензия:** GPLv3  
+> **Author / Автор:** blackgeyer | **Version / Версия:** 1.4.0 | **License / Лицензия:** GPLv3  
 > 📹 **Plugin Showcase / Видео с демонстрацией:** [Watch on YouTube](https://youtu.be/tICOrnjpwYc?si=7kcUQCJTbV0Q8HvM)
 
 > **Documentation**: https://blackgeyer.github.io/APVE/
