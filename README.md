@@ -30,7 +30,7 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 4. Restart the server.
 
 ### ⚙️ Technical Compatibility
-* **Cores:** Paper, Purpur, Spigot, etc. (any standard Bukkit-based core).
+* **Cores:** Paper, Purpur, Spigot, etc. (any standard Bukkit-based core) or Folia.
 * **Minecraft Versions:** 1.20.5 – 26.x+  
 * **Java:** 21
 
@@ -84,7 +84,7 @@ APVE: Высокопроизводительный асинхронный пла
 4. Перезапустите сервер.
 
 ### ⚙️ Совместимость
-* **Ядра:** Paper, Purpur, Spigot или любое другое ядро, основанное на Bukkit.
+* **Ядра:** Paper, Purpur, Spigot или любое другое ядро, основанное на Bukkit или Folia.
 * **Версии Minecraft:** от 1.20.5 до 26.x+
 * **Java:** 21
 
@@ -116,8 +116,3 @@ APVE: Высокопроизводительный асинхронный пла
 | `apve.social.immune` | Иммунитет к фильтру распространения соцсетей. | False |
 | `apve.advertisement.immune` | Иммунитет к фильтру рекламы и сторонних ресурсов. | False |
 | `apve.staff.insult.immune` | Иммунитет к наказаниям за оскорбление администрации (Staff). | False |
-
----
-
-## 📄 License / Лицензия
-Distributed under the **GPLv3 License**. / Распространяется по лицензии **GPLv3**.
