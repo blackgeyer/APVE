@@ -85,7 +85,7 @@ command-msg:
     header: "A.P.V.E Проверка Слов"
     raw: "Исходный текст: {raw}"
     normalized: "Нормализованный текст: {normalized}"
-    status: "Статус проверки: {status_color}{status}"
+    status: "Статус проверки: {status}"
     matched-word: "Найдено слово: {word}"
     dict-word: "Образец из словаря: {dict}"
     detail: "Детали проверки: {detail}"

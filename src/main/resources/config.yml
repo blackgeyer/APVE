@@ -1511,6 +1511,7 @@ ad-words:
 - zonecraft
 - zoobastiks
 - zoolands
+- passhkevich
 
 # 5. Social networks. If an social word appears in a message alongside domain, APVE will detect it as SOCIAL-DISTRIBUTION
 social:

@@ -1,13 +1,14 @@
 name: APVE
-version: 1.3.5
+version: 1.4.0
 main: org.apve.apve
 api-version: '1.20.5'
 authors: [blackgeyer/blackgeier]
+folia-supported: true
 
 commands:
   apve:
     description: APVE management
-    usage: /apve <reload | warns | notify>
+    usage: /apve <reload | warns | notify | check>
     permission: apve.use
 
 permissions:
