@@ -4,6 +4,7 @@ import java.util.Date
 
 plugins {
     java
+    id("com.gradleup.shadow") version "8.3.5"
 }
 
 repositories {
@@ -15,6 +16,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
+    implementation(files("libs/FoliaLib.jar"))
 }
 
 java {
@@ -36,11 +38,18 @@ fun getGitHash(): String {
     }
 }
 
-tasks.jar {
+tasks.shadowJar {
+    archiveClassifier.set("")
+    relocate("com.tcoded.folialib", "org.apve.folialib")
+
     manifest {
         attributes(
             "Git-Commit-Hash" to getGitHash(),
             "Build-Time" to SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(Date())
         )
     }
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
