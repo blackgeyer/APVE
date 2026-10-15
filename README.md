@@ -16,12 +16,18 @@
 Forget about ads, sharing adult content, insults, and other nonsense in the chat if you're using APVE!
 
 APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Designed to keep your server chat clean with zero main-thread overhead. Powered by **PacketEvents**, **Aho-Corasick** pattern matching, and **Fuzzy Matching** fallback system.
+Plugin work showcase:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c2d2dd00-10f2-454d-b39d-1ed413ef2358" alt="APVE Demo" width="750"/>
+</p>
 
 ### 🚀 Key Features & Architecture
 * **Two-Stage Pattern Matching ($O(N)$ + Fuzzy Fallback):** Words are not strictly checked by 100% exact equality alone. The plugin first uses lightning-fast Aho-Corasick string matching. If an exact match is not found in the dictionary, it automatically triggers **Fuzzy Matching** to compare the word's similarity against dictionary patterns, catching bypasses, intentional typos, and modified letters.
 * **100% Asynchronous Netty Interception:** Intercepts and drops chat packets at the network layer before they reach the server's main thread.
 * **Smart Text Normalization:** Strips homoglyphs, obfuscated characters, and leetspeak bypasses automatically.
 * **Offline Punishment Pipeline:** Issues warnings and executes configurable punishment commands automatically.
+  
+
 
 ### 🛠 Installation
 1. Install **PacketEvents** (Spigot/Paper version, NOT Bungee/Velocity proxy version) into `/plugins/`.
