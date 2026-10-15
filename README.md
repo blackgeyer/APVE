@@ -16,7 +16,8 @@
 Forget about ads, sharing adult content, insults, and other nonsense in the chat if you're using APVE!
 
 APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Designed to keep your server chat clean with zero main-thread overhead. Powered by **PacketEvents**, **Aho-Corasick** pattern matching, and **Fuzzy Matching** fallback system.
-Plugin work showcase:
+
+### Plugin work showcase:
 <p align="center">
   <img src="https://github.com/user-attachments/assets/c2d2dd00-10f2-454d-b39d-1ed413ef2358" alt="APVE Demo" width="750"/>
 </p>
