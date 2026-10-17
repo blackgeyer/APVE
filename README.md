@@ -9,7 +9,7 @@
 
 > **Documentation**: https://blackgeyer.github.io/APVE/
 
-> **Support**: https://discord.gg/TvgqnJNKXW
+> **Discord**: https://discord.gg/TvgqnJNKXW
 
 ---
 
@@ -30,7 +30,16 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 * **Smart Text Normalization:** Strips homoglyphs, obfuscated characters, and leetspeak bypasses automatically.
 * **Offline Punishment Pipeline:** Issues warnings and executes configurable punishment commands automatically.
   
-
+### Spark Profiling Results for APVE During an Attack by 30 Spam Bots (1 violation message per 10ms)
+<p align="center">
+<img src="https://github.com/user-attachments/assets/6c6f0e74-73e6-4b2a-9fca-be80862a635a" alt="APVE During an attack by 30 spam-bot attack" width="340"/>
+  </p>
+  
+### Spark Profiling Results of average RegEx based plugin during an attack by 30 Spam Bots (1 violation message per 10ms)
+<p aling="center">
+<img src="https://github.com/user-attachments/assets/ec79cb95-5c9e-4902-8cc6-1bc130caadf1" alt="Average RegEx based plugin during an attack by 30 spam-bot attack" width="340"/>
+  </p>
+  
 
 ### 🛠 Installation
 1. Install **PacketEvents** (Spigot/Paper version, NOT Bungee/Velocity proxy version) into `/plugins/`.
