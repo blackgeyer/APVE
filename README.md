@@ -36,7 +36,7 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
   </p>
   
 ### Spark Profiling Results of average RegEx based plugin during an attack by 30 Spam Bots (1 violation message per 10ms)
-<p aling="center">
+<p align="center">
 <img src="https://github.com/user-attachments/assets/ec79cb95-5c9e-4902-8cc6-1bc130caadf1" alt="Average RegEx based plugin during an attack by 30 spam-bot attack" width="340"/>
   </p>
   
