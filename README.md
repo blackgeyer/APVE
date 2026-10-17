@@ -8,6 +8,7 @@
 > 📹 **Plugin Showcase / Видео с демонстрацией:** [Watch on YouTube](https://youtu.be/tICOrnjpwYc?si=7kcUQCJTbV0Q8HvM)
 
 > **Documentation**: https://blackgeyer.github.io/APVE/
+
 > **Support**: https://discord.gg/TvgqnJNKXW
 
 ---
