@@ -1,0 +1,1 @@
+go see the https://blackgeyer.github.io/APVE/normalizer/ for the advanced information about normalizer, plugin work, config etc.
