@@ -4,7 +4,7 @@
 ![API](https://img.shields.io/badge/Dependency-PacketEvents-orange.svg)
 ![Folia Supported](https://img.shields.io/badge/Folia-Supported-brightgreen.svg)
 
-> **Author / Автор:** blackgeyer | **Version / Версия:** 1.4.0 | **License / Лицензия:** GPLv3  
+> **Author / Автор:** blackgeyer | **Version / Версия:** 1.4.5 | **License / Лицензия:** GPLv3  
 > 📹 **Plugin Showcase / Видео с демонстрацией:** [Watch on YouTube](https://youtu.be/tICOrnjpwYc?si=7kcUQCJTbV0Q8HvM)
 
 > **Documentation**: https://blackgeyer.github.io/APVE/
@@ -17,7 +17,7 @@
 
 Forget about ads, sharing adult content, insults, and other nonsense in the chat if you're using APVE!
 
-APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Designed to keep your server chat clean with zero main-thread overhead. Powered by **PacketEvents**, **Aho-Corasick** pattern matching, and **Fuzzy Matching** fallback system.
+APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Designed to keep your server chat clean with zero main-thread overhead. Powered by **PacketEvents**, **Aho-Corasick**, **RE2J** for high-optimized patterns and **Fuzzy Matching** system.
 
 ### Plugin work showcase:
 <p align="center">
@@ -25,11 +25,16 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 </p>
 
 ### 🚀 Key Features & Architecture
-* **Two-Stage Pattern Matching ($O(N)$ + Fuzzy Fallback):** Words are not strictly checked by 100% exact equality alone. The plugin first uses lightning-fast Aho-Corasick string matching. If an exact match is not found in the dictionary, it automatically triggers **Fuzzy Matching** to compare the word's similarity against dictionary patterns, catching bypasses, intentional typos, and modified letters.
-* **100% Asynchronous Netty Interception:** Intercepts and drops chat packets at the network layer before they reach the server's main thread.
-* **Smart Text Normalization:** Strips homoglyphs, obfuscated characters, and leetspeak bypasses automatically.
-* **Offline Punishment Pipeline:** Issues warnings and executes configurable punishment commands automatically.
 
+* **Three-Stage Pattern Matching ($O(N)$ + Fuzzy Fallback + Custom RE2J):** Words are not strictly checked by 100% exact equality alone. The plugin first uses lightning-fast Aho-Corasick string matching. If an exact match is not found in the dictionary, it automatically triggers **Fuzzy Matching** to compare the word's similarity against dictionary patterns, catching bypasses, intentional typos, and modified letters. **Custom RE2J Pattern Matching:** If the first two stages fail to detect a violation, you can always write your own custom regular expressions using `re2j` to enhance filtration. Thanks to $O(N)$ linear time complexity and built-in protection against ReDoS attacks, they allow you to precisely catch complex bypass schemes without risking server performance.
+* **100% Asynchronous Netty Interception:** Intercepts and drops chat packets at the network layer before they reach the server's main thread.
+- **Multi-Engine Text Normalization:** Automatically strips homoglyphs, Unicode variations, diacritics, and leetspeak bypasses. The normalization engine features three distinct operating modes:
+  * **Rude Mode:** Aggressively strips all digits and special characters (such as `|`, `?`, etc.) to isolate pure text for core dictionary checks.
+  * **Smart Mode:** Intelligent leetspeak and symbol decoding that substitutes characters like `|` or `!` with their intended alphabetic equivalents.
+  * **Despondent Mode:** Preserves digits and special characters without transformation, designed specifically to detect patterns like domain names or server addresses (e.g., `someserver2024 xyz`).
+* **Offline Punishment Pipeline:** Issues warnings and executes configurable punishment commands automatically.
+* **Commands interception**: APVE also intercepts and checks the commands like `/whisper` or `/msg`.
+ 
 ### 🛠 Installation
 1. Install **PacketEvents** (Spigot/Paper version, NOT Bungee/Velocity proxy version) into `/plugins/`.
 2. Install your primary punishment engine (e.g., **EssentialsX**, **AdvancedBan**, etc.) into `/plugins/`.
@@ -74,15 +79,22 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 
 ## 🇷🇺 Русский
 
-Забудьте об рекламе, взрослом контенте, оскорблениях и прочей ереси в чате если вы используете APVE!
+Забудьте о рекламе, взрослом контенте, оскорблениях и прочей ереси в чате, если вы используете APVE!
 
-APVE: Высокопроизводительный асинхронный плагин модерации чата. Поддерживает чистоту сервера в автоматическом режиме с нулевой нагрузкой на главный поток сервера. Работает на базе **PacketEvents**, алгоритма **Aho-Corasick** и интеллектуальной системы **Fuzzy Matching**.
+APVE: Высокопроизводительный асинхронный плагин модерации чата. Поддерживает чистоту сервера в автоматическом режиме с нулевой нагрузкой на главный поток сервера. Работает на базе **PacketEvents**, алгоритма **Aho-Corasick**, библиотеки **RE2J** для высокооптимизированных паттернов и интеллектуальной системы **Fuzzy Matching**.
 
 ### 🚀 Архитектурные преимущества
-* **Двухэтапная проверка ($O(N)$ + Fuzzy Matching):** Проверка слов не ограничивается строго 100% точным совпадением. Плагин сначала выполняет ультрабыстрый поиск через алгоритм Ахо-Корасик. Если точное совпадение в словаре не найдено, автоматически включается **Fuzzy Matching** (нечёткое сравнение), которое сопоставляет степень схожести слова с паттернами из словаря. Это позволяет эффективно ловить обходы, опечатки и намеренно искажённые слова.
+
+* **Трёхэтапная проверка ($O(N)$ + Fuzzy Fallback + Кастомный RE2J):** Проверка слов не ограничивается строго 100% точным совпадением. Плагин сначала выполняет ультрабыстрый поиск через алгоритм Ахо-Корасик. Если точное совпадение в словаре не найдено, автоматически включается **Fuzzy Matching** (нечёткое сравнение), которое сопоставляет степень схожести слова с паттернами из словаря, отлавливая обходы, опечатки и подмену букв. **Кастомные RE2J паттерны:** Если первые два этапа не смогли обнаружить нарушение, вы всегда можете написать свои кастомные регулярные выражения на базе `re2j`. Благодаря линейной сложности $O(N)$ и встроенной защите от ReDoS-атак, они позволяют точечно отлавливать сложные схемы обхода фильтра без риска для производительности сервера.
 * **Асинхронный перехват Netty:** Фильтрация и сброс запрещённых пакетов происходят на сетевом уровне до их обработки главным потоком сервера.
-* **Встроенный нормализатор:** Автоматически нейтрализует обходы через замену букв (символы-омоглифы, цифры, спецсимволы).
-* **Автоматические оффлайн-наказания:** Автоматический учёт предупреждений и исполнение команд блокировки.
+* **Многорежимный нормализатор текста:** Автоматически нейтрализует обходы через символы-омоглифы, вариации Unicode, диакритику и Leetspeak. Движок нормализации имеет три различных режима работы:
+* **Rude Mode:** Агрессивно вырезает все цифры и спецсимволы (такие как `|`, `?` и т.д.), изолируя чистый текст для базовых проверок по словарям.
+* **Smart Mode:** Интеллектуальное декодирование Leetspeak и символов, заменяющее знаки вроде `|` или `!` на аналогичные по смыслу буквы.
+* **Despondent Mode:** Сохраняет цифры и спецсимволы без изменений. Режим специально предназначен для детекта доменных имён и адресов серверов (например, `someserver2024 xyz`).
+
+
+* **Автоматические оффлайн-наказания:** Автоматический учёт предупреждений и исполнение настраиваемых команд наказаний.
+* **Перехват команд:** APVE также перехватывает и проверяет личные сообщения и команды коммуникации (например, `/whisper`, `/msg` и другие).
 
 ### 🛠 Установка
 1. Поместите плагин **PacketEvents** (Spigot/Paper версию, НЕ Proxy/Bungee/Velocity) в папку `/plugins/`.
