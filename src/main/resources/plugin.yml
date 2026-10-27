@@ -1,7 +1,7 @@
 name: APVE
-version: 1.4.0
-main: org.apve.apve
-api-version: '1.20.5'
+version: 1.4.5
+main: org.blackgeyer.apve.apve
+api-version: "1.20.5"
 authors: [blackgeyer/blackgeier]
 folia-supported: true
 
@@ -15,7 +15,7 @@ permissions:
   apve.use:
     description: Allows to use /apve command
     default: op
-    
+
   apve.reload:
     description: Allows to use /apve reload command
     default: op
@@ -44,7 +44,6 @@ permissions:
     description: Allows to use /apve check {string} command
     default: op
 
-   
   apve.violation.notify:
     description: Allows view notifies about player's violations in the game chat. (DYNAMIC)
     default: false
@@ -80,13 +79,3 @@ permissions:
   apve.staff.insult.immune:
     description: APVE will not apply any action to player with this permission if they insult staff.
     default: false
-
-
-
-
-
-
-
-
-
-

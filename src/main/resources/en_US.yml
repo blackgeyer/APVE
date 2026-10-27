@@ -32,10 +32,10 @@ adult-content:
   censor-reason: "<red>Your message was censored: Adult content."
 
 staff-insult:
-  reason: "<Staff insult."
+  reason: "Staff insult."
   blocking-reason: "<red>Your message was blocked: Staff insult."
   censor-reason: "<red>Your message was censored: Staff insult."
-      
+
 spam:
   reason: "Spam."
   blocking-reason: "<red>Your message was blocked: Spam."
@@ -48,7 +48,7 @@ caps:
 command-msg:
   perm-fail: "<red>Access denied."
   help-command-view-req: "<red>Unknown command. Type /apve help to see available commands."
-  help-command-msg: 
+  help-command-msg:
     - "<green>Available commands:"
     - "<dark_green>/apve reload — Reload APVE's configuration"
     - "<dark_green>/apve warns show <nickname> — View the player's warns history"
@@ -57,7 +57,11 @@ command-msg:
     - "<dark_green>/apve notify toggle — Toggle notifications about player violations."
     - "<dark_green>/apve check <text> — Checks the 'text' argument to the rule violations."
 
-  cfg-reload-msg: "<dark_blue>Reloading configuration..."
+  cfg-reload-msg: "Reloading configuration..."
+  cfg-reload-fail: "<red>Configuration reload aborted due to fatal errors. Check the console for more details."
+  cfg-reload-with-errors: "<yellow>Configuration reload is executed but with errors. Check the console for more details."
+  cfg-reload-scf: "<green>Configuration has been sucessfully reloaded."
+
   invalid-syntax: "<red>Invalid syntax. Usage: {usage}"
   invalid-number: "<red>Argument '{arg}' must be a valid number."
 
@@ -65,7 +69,7 @@ command-msg:
   notify-activate-msg: "<green>Successfully <dark_green>enabled <green>notifications about player violations."
   notify-disabled-msg: "<green>Successfully <dark_red>disabled <green>notifications about player violations."
   player-only: "<red>Only a player can execute this command."
-  
+
   warns:
     no-warns: "<yellow>Player {player} currently has no active warns."
     show: "<green>Player <yellow>{player} <green>has <red>{amount} <green>active warns. Highest violation rule: <red>{violation}<green>."

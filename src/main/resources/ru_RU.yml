@@ -57,7 +57,11 @@ command-msg:
     - "<dark_green>/apve notify toggle — Включить/выключить уведомления о нарушениях игроков."
     - "<dark_green>/apve check <text> — Проверяет аргумент 'text' на нарушение правил."
 
-  cfg-reload-msg: "<dark_blue>Перезагрузка конфигурации..."
+  cfg-reload-msg: "Перезагрузка конфигурации..."
+  cfg-reload-scf: "<green>Перезагрузка конфигураици прошла успешно."
+  cfg-reload-fail: "<red>Перезагрузка конфигурации провалена. Просмотрите консоль для большей информации."
+  cfg-reload-with-errors: "<yellow>Перезагрузка конфигурации прошла, однако есть ошибки. Просмотрите консоль для большей информации."
+
   invalid-syntax: "<red>Неверный синтаксис. Использование: {usage}"
   invalid-number: "<red>Аргумент '{arg}' должен быть корректным числом."
 
@@ -68,7 +72,7 @@ command-msg:
   
   warns:
     no-warns: "<yellow>У игрока {player} на данный момент нет активных предупреждений."
-    show: "<green>У игрока <yellow>{player} <red>{amount} <green>активных предупреждений. Самое строгое нарушение: <red>{violation}<green>."
+    show: "<green>У игрока <yellow>{player} <red>{amount} <green>активных предупреждений. Самое тяжёлое нарушение: <red>{violation}<green>."
     removed: "<green>Успешно снято <yellow>{amount} <green>предупреждений у <yellow>{player}<green>. Оставшиеся предупреждения: <yellow>{left}<green>."
     cleared: "<green>Все предупреждения игрока <yellow>{player} <green>успешно очищены."
 
