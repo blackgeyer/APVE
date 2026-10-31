@@ -13,7 +13,7 @@
 
 ---
 
-## 🇬🇧 English
+## English
 
 Forget about ads, sharing adult content, insults, and other nonsense in the chat if you're using APVE!
 
@@ -24,7 +24,7 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
   <img src="https://github.com/user-attachments/assets/c2d2dd00-10f2-454d-b39d-1ed413ef2358" alt="APVE Demo" width="750"/>
 </p>
 
-### 🚀 Key Features & Architecture
+### Key Features & Architecture
 
 * **Three-Stage Pattern Matching ($O(N)$ + Fuzzy Fallback + Custom RE2J):** Words are not strictly checked by 100% exact equality alone. The plugin first uses lightning-fast Aho-Corasick string matching. If an exact match is not found in the dictionary, it automatically triggers **Fuzzy Matching** to compare the word's similarity against dictionary patterns, catching bypasses, intentional typos, and modified letters. **Custom RE2J Pattern Matching:** If the first two stages fail to detect a violation, you can always write your own custom regular expressions using `re2j` to enhance filtration. Thanks to $O(N)$ linear time complexity and built-in protection against ReDoS attacks, they allow you to precisely catch complex bypass schemes without risking server performance.
 * **100% Asynchronous Netty Interception:** Intercepts and drops chat packets at the network layer before they reach the server's main thread.
@@ -32,25 +32,25 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
   * **Rude Mode:** Aggressively strips all digits and special characters (such as `|`, `?`, etc.) to isolate pure text for core dictionary checks.
   * **Smart Mode:** Intelligent leetspeak and symbol decoding that substitutes characters like `|` or `!` with their intended alphabetic equivalents.
   * **Despondent Mode:** Preserves digits and special characters without transformation, designed specifically to detect patterns like domain names or server addresses (e.g., `someserver2024 xyz`).
-* **Offline Punishment Pipeline:** Issues warnings and executes configurable punishment commands automatically.
+* **Offline Punishment Pipeline:** Issues warnings and executes configurable punishment commands automatically. (NOT RELATED TO OFFLINE-MODE, IT ALSO CAN WORK IN ONLINE-MODE!)
 * **Commands interception**: APVE also intercepts and checks the commands like `/whisper` or `/msg`.
  
-### 🛠 Installation
+### Installation
 1. Install **PacketEvents** (Spigot/Paper version, NOT Bungee/Velocity proxy version) into `/plugins/`.
 2. Install your primary punishment engine (e.g., **EssentialsX**, **AdvancedBan**, etc.) into `/plugins/`.
 3. Place `A.P.V.E.jar` into `/plugins/`.
 4. Restart the server.
 
-### ⚙️ Technical Compatibility
+### Technical Compatibility
 * **Cores:** Paper, Purpur, Spigot, etc. (any standard Bukkit-based core) or Folia.
 * **Minecraft Versions:** 1.20.5 – 26.x+  
 * **Java:** 21
 
-### ⚠️ Important Usage Notes
+### Important Usage Notes
 * Configure `config.yml` before deploying to production to set up punishment command templates and avoid false positives.
 * Due to the internal normalization pipeline, all banned word patterns in `config.yml` must be entered using **Latin characters only** (e.g., use `shlyuha` instead of `шлюха`). Refer to `documentation.txt` for details.
 
-### 💻 Commands & Permissions
+### Commands & Permissions
 | Command | Description | Permission | Default |
 | :--- | :--- | :--- | :--- |
 | `/apve` | Base command for plugin management. | `apve.use` | OP |
@@ -62,7 +62,7 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 | `/apve check {string}` | Normalizes and tests a string against filter rules. | `apve.check` | OP |
 | `/apve help` | Displays available commands and usage info. | `apve.help` | OP |
 
-### 🔑 Additional Permissions & Immunity Nodes
+### Additional Permissions & Immunity Nodes
 | Permission | Description | Default |
 | :--- | :--- | :--- |
 | `apve.violation.notify` | Allows receiving real-time chat notifications about player violations. | False |
@@ -77,7 +77,7 @@ APVE: High-performance, fully asynchronous Minecraft chat moderation plugin. Des
 
 ---
 
-## 🇷🇺 Русский
+## Русский
 
 Забудьте о рекламе, взрослом контенте, оскорблениях и прочей ереси в чате, если вы используете APVE!
 
@@ -93,25 +93,25 @@ APVE: Высокопроизводительный асинхронный пла
 * **Despondent Mode:** Сохраняет цифры и спецсимволы без изменений. Режим специально предназначен для детекта доменных имён и адресов серверов (например, `someserver2024 xyz`).
 
 
-* **Автоматические оффлайн-наказания:** Автоматический учёт предупреждений и исполнение настраиваемых команд наказаний.
+* **Автоматические оффлайн-наказания:** Автоматический учёт предупреждений и исполнение настраиваемых команд наказаний. (NOT RELATED TO OFFLINE-MODE, IT ALSO CAN WORK IN ONLINE-MODE!)
 * **Перехват команд:** APVE также перехватывает и проверяет личные сообщения и команды коммуникации (например, `/whisper`, `/msg` и другие).
 
-### 🛠 Установка
+### Установка
 1. Поместите плагин **PacketEvents** (Spigot/Paper версию, НЕ Proxy/Bungee/Velocity) в папку `/plugins/`.
 2. Поместите плагин наказаний (например, **EssentialsX**, **AdvancedBan** и т.д.) в папку `/plugins/`.
 3. Загрузите файл `A.P.V.E.jar` в папку `/plugins/`.
 4. Перезапустите сервер.
 
-### ⚙️ Совместимость
+### Совместимость
 * **Ядра:** Paper, Purpur, Spigot или любое другое ядро, основанное на Bukkit или Folia.
 * **Версии Minecraft:** от 1.20.5 до 26.x+
 * **Java:** 21
 
-### ⚠️ Важные предупреждения
+### Важные предупреждения
 * Перед запуском настройте `config.yml` и шаблоны команд наказаний, чтобы исключить ложные срабатывания.
 * Из-за работы нормализатора все паттерны запрещённых слов в `config.yml` вносятся **строго латиницей** (пример: `шлюха` -> `shlyuha`). Подробный разбор — в `documentation.txt`.
 
-### 💻 Команды и права
+### Команды и права
 | Команда | Описание | Право | По умолчанию |
 | :--- | :--- | :--- | :--- |
 | `/apve` | Базовая команда управления плагином. | `apve.use` | OP |
@@ -123,7 +123,7 @@ APVE: Высокопроизводительный асинхронный пла
 | `/apve check {строка}` | Проверяет и нормализует строку на предмет нарушений. | `apve.check` | OP |
 | `/apve help` | Выводит список команд и их описание. | `apve.help` | OP |
 
-### 🔑 Дополнительные права и узлы иммунитета
+### Дополнительные права и узлы иммунитета
 | Право | Описание | По умолчанию |
 | :--- | :--- | :--- |
 | `apve.violation.notify` | Позволяет получать уведомления о нарушениях игроков в чате в реальном времени. | OP |
